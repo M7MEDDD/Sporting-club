@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.admin.Controller.DashboardController">
+   <top>
+      <HBox alignment="CENTER_LEFT" spacing="10" styleClass="header">
+         <children>
+            <Label styleClass="app-title" text="Sporting Club Management" />
+            <Button onAction="#handleLogout" styleClass="logout-button" text="Logout" />
+         </children>
+      </HBox>
+   </top>
+   <left>
+      <VBox prefHeight="344.0" prefWidth="280.0" spacing="20" styleClass="nav-pane">
+         <children>
+            <Button onAction="#goToMemberManagement" text="Member Management" />
+            <Button onAction="#goToTeamManagement" text="Team Management" />
+            <Button layoutX="30.0" layoutY="71.0" onAction="#goToSubscriptionsManagement" prefHeight="46.0" prefWidth="211.0" text="Subscriptions Management" />
+            <Button onAction="#goToExpenseManagement" text="Expense Management" />
+            <Button onAction="#goToReports" text="Reports" />
+         </children>
+      </VBox>
+   </left>
+</BorderPane>

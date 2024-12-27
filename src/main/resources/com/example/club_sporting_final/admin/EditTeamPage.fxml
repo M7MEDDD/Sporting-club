@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<DialogPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.admin.Controller.EditTeamController">
+    <content>
+        <VBox spacing="10">
+            <Label text="Edit Team" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <GridPane hgap="10" vgap="10">
+                <Label text="Team Name:"/>
+                <TextField fx:id="teamNameField" promptText="Edit team name" GridPane.columnIndex="1"/>
+
+                <Label text="Team Leader ID:" GridPane.rowIndex="1"/>
+                <TextField fx:id="teamLeaderIDField" promptText="Edit team leader ID" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            </GridPane>
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button text="Save" onAction="#handleSave"/>
+                <Button text="Cancel" onAction="#handleCancel"/>
+            </HBox>
+        </VBox>
+    </content>
+</DialogPane>

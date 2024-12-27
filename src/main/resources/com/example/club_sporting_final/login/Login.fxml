@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox  xmlns="http://javafx.com/javafx"
+       xmlns:fx="http://javafx.com/fxml"
+       fx:controller="com.example.club_sporting_final.login.Controller.LoginController"
+       prefHeight="400.0" prefWidth="600.0"
+       spacing="20" alignment="CENTER" >
+
+    <!-- Application Title -->
+    <Label text="Sporting Club Management" styleClass="app-title" />
+
+    <!-- Login Form -->
+    <VBox spacing="10" alignment="CENTER">
+        <TextField fx:id="usernameField" promptText="Username" />
+        <PasswordField fx:id="passwordField" promptText="Password" />
+        <Label fx:id="errorLabel" text="Invalid username or password!" visible="false" styleClass="error-label" />
+    </VBox>
+
+    <!-- Login Button -->
+    <Button text="Login" styleClass="login-button" onAction="#handleLogin" />
+</VBox >

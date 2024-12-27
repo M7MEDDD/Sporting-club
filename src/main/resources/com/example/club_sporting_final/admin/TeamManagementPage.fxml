@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="600.0" prefWidth="800.0" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.admin.Controller.TeamManagementController">
+    <!-- Header Section -->
+    <HBox alignment="CENTER" prefHeight="36.0" prefWidth="800.0" spacing="10.0">
+        <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Team Management" />
+    </HBox>
+
+    <!-- Search Section -->
+    <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10;">
+        <TextField fx:id="searchField" promptText="Search by ID or name" />
+        <Button fx:id="searchButton" onAction="#searchTeam" text="Search" />
+    </HBox>
+
+    <!-- TableView Section -->
+    <TableView fx:id="teamTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" prefWidth="100" text="Team ID" />
+            <TableColumn fx:id="nameColumn" prefWidth="200" text="Team Name" />
+            <TableColumn fx:id="coachColumn" prefWidth="200" text="Coach Name" />
+            <TableColumn fx:id="categoryColumn" prefWidth="150" text="Category" />
+        </columns>
+    </TableView>
+
+    <!-- Action Buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding: 10;">
+        <Button fx:id="addButton" onAction="#addTeam" text="Add Team" />
+        <Button fx:id="editButton" text="Edit Team" />
+        <Button fx:id="deleteButton" onAction="#deleteTeam" text="Delete Team" />
+    </HBox>
+</VBox>

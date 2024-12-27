@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+        <VBox spacing="10" alignment="CENTER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.admin.Controller.AddTeamController">
+            <Label text="Add New Team" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+            <!-- Team Name -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Team Name:" />
+                <TextField fx:id="teamNameField" promptText="Enter team name" />
+            </HBox>
+
+            <!-- Coach Name -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Coach Name:" />
+                <TextField fx:id="coachNameField" promptText="Enter coach name" />
+
+            </HBox>
+
+            <!-- Category -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Category:" />
+                <ChoiceBox fx:id="categoryChoiceBox" prefWidth="150" />
+            </HBox>
+
+            <!-- Buttons -->
+            <HBox spacing="10" alignment="CENTER">
+                <Button text="Save" fx:id="saveButton" onAction="#handleSave" />
+                <Button text="Cancel" fx:id="cancelButton" onAction="#handleCancel" />
+            </HBox>
+        </VBox>
+

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.admin.Controller.AddMemberController" spacing="10" alignment="TOP_CENTER" prefHeight="500.0" prefWidth="600.0">
+    <!-- Title -->
+    <Label text="Member Details" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+    <!-- Input Fields -->
+    <GridPane hgap="10" vgap="10">
+        <!-- Name -->
+        <Label text="Name:" />
+        <TextField fx:id="nameField" promptText="Enter member's name" GridPane.columnIndex="1" />
+
+        <!-- Email -->
+        <Label text="Email:" GridPane.rowIndex="1" />
+        <TextField fx:id="emailField" promptText="Enter email address" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <!-- Phone -->
+        <Label text="Phone Number:" GridPane.rowIndex="2" />
+        <TextField fx:id="phoneField" promptText="Enter phone number" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <!-- Subscription Status -->
+        <Label text="Subscription Active:" GridPane.rowIndex="3" />
+        <CheckBox fx:id="subscriptionStatus" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <!-- Team Choice -->
+        <Label text="Team:" GridPane.rowIndex="4" />
+        <ChoiceBox fx:id="teamChoice" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+        <!-- Subscription Plan -->
+        <Label text="Subscription Plan:" GridPane.rowIndex="5" />
+        <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="5">
+            <RadioButton fx:id="monthlyPlan" text="Monthly" />
+            <RadioButton fx:id="quarterlyPlan" text="Quarterly" />
+            <RadioButton fx:id="yearlyPlan" text="Yearly" />
+        </HBox>
+    </GridPane>
+
+    <!-- Action Buttons -->
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Save" onAction="#handleSave" />
+        <Button text="Cancel" onAction="#handleCancel" />
+    </HBox>
+</VBox>
