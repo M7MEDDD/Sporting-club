@@ -27,6 +27,7 @@
             <TableColumn fx:id="nameColumn" prefWidth="200" text="Team Name" />
             <TableColumn fx:id="coachColumn" prefWidth="200" text="Coach Name" />
             <TableColumn fx:id="categoryColumn" prefWidth="150" text="Category" />
+            <TableColumn fx:id="memberCountColumn" prefWidth="150" text="Member Count" />
         </columns>
     </TableView>
 
@@ -35,5 +36,6 @@
         <Button fx:id="addButton" onAction="#addTeam" text="Add Team" />
         <Button fx:id="editButton" onAction="#editTeam" text="Edit Team" />
         <Button fx:id="deleteButton" onAction="#deleteTeam" text="Delete Team" />
+        <Button fx:id="backButton" onAction="#returnToDashboard" text="Back to Dashboard" />
     </HBox>
 </VBox>

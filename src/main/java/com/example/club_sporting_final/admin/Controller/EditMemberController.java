@@ -32,6 +32,18 @@ public class EditMemberController {
     @FXML
     private ChoiceBox<Team> teamChoiceBox;
 
+    @FXML
+    private Label nameErrorLabel;
+
+    @FXML
+    private Label emailErrorLabel;
+
+    @FXML
+    private Label phoneErrorLabel;
+
+    @FXML
+    private Label teamErrorLabel;
+
     private Members member;
     private ObservableList<Team> teamList = FXCollections.observableArrayList();
 
@@ -68,7 +80,7 @@ public class EditMemberController {
              PreparedStatement stmt = connection.prepareStatement("SELECT TeamID, TeamName FROM teams")) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                teamList.add(new Team(rs.getInt("TeamID"), rs.getString("TeamName"), null, null));
+                teamList.add(new Team(rs.getInt("TeamID"), rs.getString("TeamName"), null, null, rs.getInt("MemberCount")));
             }
             teamChoiceBox.setItems(teamList);
         } catch (SQLException e) {
@@ -99,10 +111,7 @@ public class EditMemberController {
         boolean isSubscribed = subscriptionStatus.isSelected();
         Team selectedTeam = teamChoiceBox.getValue();
 
-        if (name.isEmpty() || email.isEmpty() || phone.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill in all required fields.");
-            return;
-        }
+        if (!validateInputs(name, email, phone, selectedTeam)) return;
 
         try (Connection connection = DatabaseConnection.getInstance().getConnection()) {
             connection.setAutoCommit(false); // Start transaction
@@ -127,6 +136,40 @@ public class EditMemberController {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Database Error", "An error occurred while updating the member: " + e.getMessage());
         }
+    }
+
+    private boolean validateInputs(String name, String email, String phone, Team team) {
+        boolean valid = true;
+
+        if (name.isEmpty()) {
+            nameErrorLabel.setVisible(true);
+            valid = false;
+        } else {
+            nameErrorLabel.setVisible(false);
+        }
+
+        if (!email.matches("^\\S+@\\S+\\.\\S+$")) {
+            emailErrorLabel.setVisible(true);
+            valid = false;
+        } else {
+            emailErrorLabel.setVisible(false);
+        }
+
+        if (!phone.matches("\\d{10}")) {
+            phoneErrorLabel.setVisible(true);
+            valid = false;
+        } else {
+            phoneErrorLabel.setVisible(false);
+        }
+
+        if (team == null) {
+            teamErrorLabel.setVisible(true);
+            valid = false;
+        } else {
+            teamErrorLabel.setVisible(false);
+        }
+
+        return valid;
     }
 
     /**

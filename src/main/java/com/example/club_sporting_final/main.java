@@ -5,13 +5,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 
-public class MEAN extends Application {
+public class main extends Application {
     @Override
-    public void start(Stage stage) throws IOException {
-
+    public void start(Stage stage) throws Exception {
         URL fxmlUrl = getClass().getResource("/com/example/club_sporting_final/login/Login.fxml");
 
         // Load FXML

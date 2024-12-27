@@ -90,9 +90,6 @@ public class AddTeamController {
         stage.close();
     }
 
-    public boolean isTeamAdded() {
-        return teamAdded;
-    }
 
     private void showAlert(Alert.AlertType alertType, String title, String content) {
         Alert alert = new Alert(alertType);

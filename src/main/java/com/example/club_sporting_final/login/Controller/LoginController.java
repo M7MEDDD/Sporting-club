@@ -53,15 +53,8 @@ public class LoginController {
     }
 
 
-    /**
-     * Validates the user's credentials against the database and retrieves the user role.
-     *
-     * @param username The username entered by the user.
-     * @param password The hashed password entered by the user.
-     * @return The role of the user ("admin" or "emp") if valid, null otherwise.
-     */
     private String validateCredentials(String username, String password) {
-        String query = "SELECT role FROM login WHERE username = ? AND password = ?";
+        String query = "SELECT role FROM users WHERE username = ? AND password = ?";
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, username);
@@ -79,17 +72,6 @@ public class LoginController {
     }
 
 
-    /**
-     * Hashes a password using SHA-256.
-     *
-     * @param password The plain text password to hash.
-     * @return The hashed password as a hexadecimal string.
-     */
-
-
-    /**
-     * Loads the admin dashboard after successful login.
-     */
     private void loadAdminDashboard() {
         try {
             System.out.println(getClass().getResource("/com/example/club_sporting_final/admin/DashBoard.fxml"));
@@ -105,9 +87,6 @@ public class LoginController {
     }
 
 
-    /**
-     * Loads the employee dashboard after successful login.
-     */
     private void loadEmployeeDashboard() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/club_sporting_final/dashboard/EmployeeDashboard.fxml"));

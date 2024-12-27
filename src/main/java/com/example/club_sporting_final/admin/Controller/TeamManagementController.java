@@ -35,10 +35,13 @@ public class TeamManagementController {
     private TableColumn<Team, String> categoryColumn;
 
     @FXML
+    private TableColumn<Team, Integer> memberCountColumn;
+
+    @FXML
     private TextField searchField;
 
     @FXML
-    private Button addButton, editButton, deleteButton, searchButton;
+    private Button addButton, editButton, deleteButton, searchButton, backButton;
 
     private ObservableList<Team> teamList = FXCollections.observableArrayList();
 
@@ -49,6 +52,7 @@ public class TeamManagementController {
         nameColumn.setCellValueFactory(data -> data.getValue().teamNameProperty());
         coachColumn.setCellValueFactory(data -> data.getValue().coachNameProperty());
         categoryColumn.setCellValueFactory(data -> data.getValue().categoryProperty());
+        memberCountColumn.setCellValueFactory(data -> data.getValue().memberCountProperty().asObject());
 
         // Load teams into the TableView
         loadTeams();
@@ -56,7 +60,12 @@ public class TeamManagementController {
 
     private void loadTeams() {
         teamList.clear();
-        String query = "SELECT TeamID, TeamName, CoachName, Category FROM Teams";
+        String query = """
+                SELECT t.TeamID, t.TeamName, t.CoachName, t.Category, COUNT(m.MemberID) AS MemberCount
+                FROM Teams t
+                LEFT JOIN Members m ON t.TeamID = m.TeamID
+                GROUP BY t.TeamID, t.TeamName, t.CoachName, t.Category
+                """;
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = connection.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
@@ -66,7 +75,8 @@ public class TeamManagementController {
                         rs.getInt("TeamID"),
                         rs.getString("TeamName"),
                         rs.getString("CoachName"),
-                        rs.getString("Category")
+                        rs.getString("Category"),
+                        rs.getInt("MemberCount")
                 ));
             }
 
@@ -85,7 +95,13 @@ public class TeamManagementController {
         }
 
         teamList.clear();
-        String query = "SELECT TeamID, TeamName, CoachName, Category FROM Teams WHERE TeamID = ? OR TeamName LIKE ?";
+        String query = """
+                SELECT t.TeamID, t.TeamName, t.CoachName, t.Category, COUNT(m.MemberID) AS MemberCount
+                FROM Teams t
+                LEFT JOIN Members m ON t.TeamID = m.TeamID
+                WHERE t.TeamID = ? OR t.TeamName LIKE ?
+                GROUP BY t.TeamID, t.TeamName, t.CoachName, t.Category
+                """;
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
@@ -98,8 +114,8 @@ public class TeamManagementController {
                         rs.getInt("TeamID"),
                         rs.getString("TeamName"),
                         rs.getString("CoachName"),
-                        rs.getString("Category")
-
+                        rs.getString("Category"),
+                        rs.getInt("MemberCount")
                 ));
             }
 
@@ -113,6 +129,7 @@ public class TeamManagementController {
         }
         teamTable.setItems(teamList);
     }
+
     @FXML
     private void addTeam() {
         try {
@@ -192,6 +209,18 @@ public class TeamManagementController {
         }
     }
 
+    @FXML
+    private void returnToDashboard() {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/com/example/club_sporting_final/admin/Dashboard.fxml"));
+            Stage stage = (Stage) teamTable.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Dashboard");
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not return to Dashboard.");
+        }
+    }
 
     private void showAlert(Alert.AlertType alertType, String title, String content) {
         Alert alert = new Alert(alertType);

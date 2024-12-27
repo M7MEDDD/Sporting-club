@@ -1,6 +1,7 @@
 package com.example.club_sporting_final.admin.Controller;
 
 import com.example.club_sporting_final.admin.module.Members;
+import com.example.club_sporting_final.utils.DatabaseConnection;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,7 +10,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import com.example.club_sporting_final.utils.DatabaseConnection;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -20,15 +20,12 @@ import java.sql.SQLException;
 
 public class MemberManagementController {
 
-
     @FXML
     private TextField textSearch;
 
-
-
-
     @FXML
     private Button btSearch;
+
     @FXML
     private TableView<Members> memberTable;
 
@@ -48,7 +45,7 @@ public class MemberManagementController {
     private TableColumn<Members, String> statusColumn;
 
     @FXML
-    private Button addButton, editButton, deleteButton;
+    private Button addButton, editButton, deleteButton, backButton;
 
     private ObservableList<Members> memberList = FXCollections.observableArrayList();
 
@@ -66,11 +63,12 @@ public class MemberManagementController {
         loadMembers();
 
         // Set button actions
-        addButton.setOnAction(e -> addMember());
-        editButton.setOnAction(e -> editMember());
+        addButton.setOnAction(e -> openAddMemberForm());
+        editButton.setOnAction(e -> openEditMemberForm());
         deleteButton.setOnAction(e -> deleteMember());
+        backButton.setOnAction(e -> returnToDashboard());
+        btSearch.setOnAction(e -> searchMembers());
     }
-
 
     private void loadMembers() {
         memberList.clear();
@@ -95,12 +93,50 @@ public class MemberManagementController {
         memberTable.setItems(memberList);
     }
 
-    private void addMember() {
-        System.out.println("Adding Member");
+    @FXML
+    private void searchMembers() {
+        String searchQuery = textSearch.getText().trim();
+        if (searchQuery.isEmpty()) {
+            showError("Search Error", "Search field cannot be empty.");
+            return;
+        }
+
+        memberList.clear();
+        String query = "SELECT MemberID, Name, Email, PhoneNumber, SubscriptionStatus FROM Members WHERE MemberID = ? OR Name LIKE ?";
+        try (Connection connection = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            stmt.setString(1, searchQuery);
+            stmt.setString(2, "%" + searchQuery + "%");
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                boolean subscriptionStatus = "active".equalsIgnoreCase(rs.getString("SubscriptionStatus"));
+                memberList.add(new Members(
+                        rs.getInt("MemberID"),
+                        rs.getString("Name"),
+                        rs.getString("Email"),
+                        rs.getString("PhoneNumber"),
+                        subscriptionStatus
+                ));
+            }
+
+            if (memberList.isEmpty()) {
+                showError("No Results", "No members found with the given ID or name.");
+            }
+
+        } catch (SQLException e) {
+            showError("Database Error", "An error occurred while searching for members: " + e.getMessage());
+        }
+
+        memberTable.setItems(memberList);
+    }
+
+    private void openAddMemberForm() {
         openForm("/com/example/club_sporting_final/admin/AddMembersPage.fxml", "Add Member");
     }
 
-    private void editMember() {
+    private void openEditMemberForm() {
         Members selectedMember = memberTable.getSelectionModel().getSelectedItem();
         if (selectedMember == null) {
             showAlert(Alert.AlertType.WARNING, "No Selection", "Please select a member to edit.");
@@ -156,6 +192,11 @@ public class MemberManagementController {
         }
     }
 
+    @FXML
+    private void returnToDashboard() {
+        openForm("/com/example/club_sporting_final/admin/DashBoard.fxml", "Dashboard");
+    }
+
     private void openForm(String fxmlPath, String title) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
@@ -170,44 +211,6 @@ public class MemberManagementController {
         } catch (IOException e) {
             showError("Navigation Error", "Could not open the requested form.");
         }
-    }
-    @FXML
-    private void searchMembers() {
-        String searchQuery = textSearch.getText().trim();
-        if (searchQuery.isEmpty()) {
-            showError("Search Error", "Search field cannot be empty.");
-            return;
-        }
-
-        memberList.clear();
-        String query = "SELECT MemberID, Name, Email, PhoneNumber, SubscriptionStatus FROM Members WHERE MemberID = ? OR Name LIKE ?";
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-
-            stmt.setString(1, searchQuery);
-            stmt.setString(2, "%" + searchQuery + "%");
-
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                boolean subscriptionStatus = "active".equalsIgnoreCase(rs.getString("SubscriptionStatus"));
-                memberList.add(new Members(
-                        rs.getInt("MemberID"),
-                        rs.getString("Name"),
-                        rs.getString("Email"),
-                        rs.getString("PhoneNumber"),
-                        subscriptionStatus
-                ));
-            }
-
-            if (memberList.isEmpty()) {
-                showError("No Results", "No members found with the given ID or name.");
-            }
-
-        } catch (SQLException e) {
-            showError("Database Error", "An error occurred while searching for members: " + e.getMessage());
-        }
-
-        memberTable.setItems(memberList);
     }
 
     private void showError(String title, String message) {

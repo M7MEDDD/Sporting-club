@@ -28,7 +28,7 @@ public class AddMemberController {
     private CheckBox subscriptionStatus;
 
     @FXML
-    private ChoiceBox<Team> teamChoiceBox; // Stores Team objects
+    private ChoiceBox<Team> teamChoiceBox;
 
     @FXML
     private RadioButton monthlyPlan;
@@ -51,13 +51,13 @@ public class AddMemberController {
 
     @FXML
     public void initialize() {
-        // Initialize the toggle group for subscription plans
+        // Initialize toggle group
         planToggleGroup = new ToggleGroup();
         monthlyPlan.setToggleGroup(planToggleGroup);
         quarterlyPlan.setToggleGroup(planToggleGroup);
         yearlyPlan.setToggleGroup(planToggleGroup);
 
-        // Load teams into the ChoiceBox
+        // Load teams
         loadTeams();
     }
 
@@ -66,12 +66,10 @@ public class AddMemberController {
              PreparedStatement stmt = connection.prepareStatement("SELECT TeamID, TeamName FROM teams")) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                // Add team data to the team list
-                teamList.add(new Team(rs.getInt("TeamID"), rs.getString("TeamName"), null, null));
+                teamList.add(new Team(rs.getInt("TeamID"), rs.getString("TeamName"), null, null, rs.getInt("MemberCount")));
             }
             teamChoiceBox.setItems(FXCollections.observableArrayList(teamList));
         } catch (SQLException e) {
-            e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load teams: " + e.getMessage());
         }
     }
@@ -85,21 +83,18 @@ public class AddMemberController {
         boolean isSubscribed = subscriptionStatus.isSelected();
         String planType = getSelectedPlanType();
 
-        if (memberName.isEmpty() || email.isEmpty() || phone.isEmpty() || selectedTeam == null || planType == null) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill in all fields and select a team and subscription plan.");
-            return;
-        }
+        if (!validateInputs(memberName, email, phone, selectedTeam, planType)) return;
 
         String insertMemberQuery = "INSERT INTO members (Name, Email, PhoneNumber) VALUES (?, ?, ?)";
         String associateTeamQuery = "INSERT INTO team_members (MemberID, TeamID) VALUES (?, ?)";
         String insertSubscriptionQuery = "INSERT INTO subscriptions (MemberID, PlanType, StartDate, EndDate, Amount) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConnection.getInstance().getConnection()) {
-            connection.setAutoCommit(false); // Start transaction
+            connection.setAutoCommit(false);
 
             int memberID;
 
-            // Step 1: Insert member into the `members` table
+            // Step 1: Insert member
             try (PreparedStatement memberStmt = connection.prepareStatement(insertMemberQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 memberStmt.setString(1, memberName);
                 memberStmt.setString(2, email);
@@ -110,42 +105,55 @@ public class AddMemberController {
                 if (generatedKeys.next()) {
                     memberID = generatedKeys.getInt(1);
                 } else {
-                    throw new SQLException("Failed to retrieve generated MemberID.");
+                    throw new SQLException("Failed to retrieve MemberID.");
                 }
             }
 
-            // Step 2: Associate the member with the selected team
-            try (PreparedStatement teamMemberStmt = connection.prepareStatement(associateTeamQuery)) {
-                teamMemberStmt.setInt(1, memberID);
-                teamMemberStmt.setInt(2, selectedTeam.getTeamID());
-                teamMemberStmt.executeUpdate();
+            // Step 2: Associate with team
+            try (PreparedStatement teamStmt = connection.prepareStatement(associateTeamQuery)) {
+                teamStmt.setInt(1, memberID);
+                teamStmt.setInt(2, selectedTeam.getTeamID());
+                teamStmt.executeUpdate();
             }
 
-            // Step 3: Insert subscription data into the `subscriptions` table if subscribed
+            // Step 3: Insert subscription
             if (isSubscribed) {
                 String startDate = java.time.LocalDate.now().toString();
                 String endDate = calculateEndDate(startDate, planType);
                 double amount = calculateSubscriptionAmount(planType);
 
-                try (PreparedStatement subscriptionStmt = connection.prepareStatement(insertSubscriptionQuery)) {
-                    subscriptionStmt.setInt(1, memberID);
-                    subscriptionStmt.setString(2, planType);
-                    subscriptionStmt.setString(3, startDate);
-                    subscriptionStmt.setString(4, endDate);
-                    subscriptionStmt.setDouble(5, amount);
-                    subscriptionStmt.executeUpdate();
+                try (PreparedStatement subStmt = connection.prepareStatement(insertSubscriptionQuery)) {
+                    subStmt.setInt(1, memberID);
+                    subStmt.setString(2, planType);
+                    subStmt.setString(3, startDate);
+                    subStmt.setString(4, endDate);
+                    subStmt.setDouble(5, amount);
+                    subStmt.executeUpdate();
                 }
             }
 
-            connection.commit(); // Commit transaction
+            connection.commit();
             showAlert(Alert.AlertType.INFORMATION, "Success", "Member and subscription added successfully.");
-            Stage stage = (Stage) nameField.getScene().getWindow();
-            stage.close();
-
+            closeWindow();
         } catch (SQLException e) {
-            e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Database Error", "An error occurred: " + e.getMessage());
         }
+    }
+
+    private boolean validateInputs(String name, String email, String phone, Team team, String planType) {
+        if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || team == null || planType == null) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "All fields must be filled.");
+            return false;
+        }
+        if (!email.matches("^\\S+@\\S+\\.\\S+$")) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Enter a valid email address.");
+            return false;
+        }
+        if (!phone.matches("\\d{10}")) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Enter a valid 10-digit phone number.");
+            return false;
+        }
+        return true;
     }
 
     private String getSelectedPlanType() {
@@ -155,34 +163,29 @@ public class AddMemberController {
 
     private String calculateEndDate(String startDate, String planType) {
         java.time.LocalDate start = java.time.LocalDate.parse(startDate);
-        switch (planType) {
-            case "monthly":
-                return start.plusMonths(1).toString();
-            case "quarterly":
-                return start.plusMonths(3).toString();
-            case "yearly":
-                return start.plusYears(1).toString();
-            default:
-                throw new IllegalArgumentException("Invalid plan type: " + planType);
-        }
+        return switch (planType) {
+            case "monthly" -> start.plusMonths(1).toString();
+            case "quarterly" -> start.plusMonths(3).toString();
+            case "yearly" -> start.plusYears(1).toString();
+            default -> throw new IllegalArgumentException("Invalid plan type: " + planType);
+        };
     }
 
     private double calculateSubscriptionAmount(String planType) {
-        switch (planType) {
-            case "monthly":
-                return 50.0;
-            case "quarterly":
-                return 150.0;
-            case "yearly":
-                return 500.0;
-            default:
-                throw new IllegalArgumentException("Invalid plan type: " + planType);
-        }
+        return switch (planType) {
+            case "monthly" -> 50.0;
+            case "quarterly" -> 150.0;
+            case "yearly" -> 500.0;
+            default -> throw new IllegalArgumentException("Invalid plan type: " + planType);
+        };
     }
 
     @FXML
     private void handleCancel() {
-        // Close the current window
+        closeWindow();
+    }
+
+    private void closeWindow() {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
     }

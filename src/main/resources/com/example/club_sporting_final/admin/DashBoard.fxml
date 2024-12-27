@@ -26,4 +26,15 @@
          </children>
       </VBox>
    </left>
+   <center>
+      <VBox alignment="CENTER" spacing="10" styleClass="content-area">
+         <Label text="Welcome to the Dashboard" styleClass="dashboard-welcome-label" />
+         <Label text="Select an option from the menu to get started." styleClass="dashboard-instruction-label" />
+      </VBox>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER" spacing="10" styleClass="footer">
+
+      </HBox>
+   </bottom>
 </BorderPane>
