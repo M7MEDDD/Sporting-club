@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.club_sporting_final.admin.Controller.SubscriptionsManagementController"
+      spacing="10" alignment="TOP_CENTER" prefHeight="600.0" prefWidth="800.0">
+
+    <!-- Page Header -->
+    <Label text="Subscriptions Management" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+    <!-- Search Section -->
+    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+        <TextField fx:id="searchField" promptText="Search by Member Name or Plan" />
+        <Button fx:id="searchButton" text="Search" onAction="#searchSubscriptions" />
+    </HBox>
+
+    <!-- Table Section -->
+    <TableView fx:id="subscriptionTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="50" />
+            <TableColumn fx:id="memberColumn" text="Member ID" prefWidth="100" />
+            <TableColumn fx:id="planColumn" text="Plan" prefWidth="100" />
+            <TableColumn fx:id="startDateColumn" text="Start Date" prefWidth="100" />
+            <TableColumn fx:id="endDateColumn" text="End Date" prefWidth="100" />
+            <TableColumn fx:id="amountColumn" text="Amount" prefWidth="100" />
+        </columns>
+    </TableView>
+
+    <!-- Action Buttons -->
+    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10;">
+<!--        <Button fx:id="addButton" text="Add Subscription" onAction="#addSubscription" />-->
+        <Button fx:id="editButton" text="Manage" onAction="#editSubscription" />
+        <Button fx:id="deleteButton" text="Delete" onAction="#deleteSubscription" />
+        <Button fx:id="inactiveButton" text="Show Inactive" onAction="#showInactiveSubscriptions" />
+    </HBox>
+
+</VBox>

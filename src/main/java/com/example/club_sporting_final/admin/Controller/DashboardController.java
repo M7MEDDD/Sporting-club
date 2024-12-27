@@ -29,8 +29,9 @@ public class DashboardController {
 
     @FXML
     private void goToSubscriptionsManagement(ActionEvent event) {
-        openNewPage(event, "/com/example/club_sporting_final/admin/ExpenseManagement.fxml", "Expense Management");
+        openNewPage(event, "/com/example/club_sporting_final/admin/SubscriptionsManagement.fxml", "Subscriptions Management");
     }
+
 
     @FXML
     private void goToReports(ActionEvent event) {
