@@ -48,8 +48,6 @@ public class Team {
         return category;
     }
 
-
-
     // Setters
     public void setTeamID(int teamID) {
         this.teamID.set(teamID);
@@ -67,6 +65,9 @@ public class Team {
         this.category.set(category);
     }
 
-
-
+    // Override toString to display teamName in ChoiceBox
+    @Override
+    public String toString() {
+        return getTeamName(); // Return the team name for display purposes
+    }
 }

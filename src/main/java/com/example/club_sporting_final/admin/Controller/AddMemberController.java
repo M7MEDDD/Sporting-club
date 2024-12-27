@@ -1,10 +1,9 @@
 package com.example.club_sporting_final.admin.Controller;
 
-import com.example.club_sporting_final.utils.DatabaseConnection;
 import com.example.club_sporting_final.admin.module.Team;
+import com.example.club_sporting_final.utils.DatabaseConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -40,8 +39,6 @@ public class AddMemberController {
     @FXML
     private RadioButton yearlyPlan;
 
-
-
     @FXML
     private Button saveButton;
 
@@ -60,8 +57,6 @@ public class AddMemberController {
         quarterlyPlan.setToggleGroup(planToggleGroup);
         yearlyPlan.setToggleGroup(planToggleGroup);
 
-
-
         // Load teams into the ChoiceBox
         loadTeams();
     }
@@ -71,7 +66,7 @@ public class AddMemberController {
              PreparedStatement stmt = connection.prepareStatement("SELECT TeamID, TeamName FROM teams")) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                // Add only the team name to the teamList
+                // Add team data to the team list
                 teamList.add(new Team(rs.getInt("TeamID"), rs.getString("TeamName"), null, null));
             }
             teamChoiceBox.setItems(FXCollections.observableArrayList(teamList));
@@ -83,19 +78,67 @@ public class AddMemberController {
 
     @FXML
     private void handleSave() {
-        Team selectedTeam = teamChoiceBox.getValue(); // Get the selected team object
-        if (selectedTeam == null) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please select a team.");
+        String memberName = nameField.getText().trim();
+        String email = emailField.getText().trim();
+        String phone = phoneField.getText().trim();
+        Team selectedTeam = teamChoiceBox.getValue();
+        boolean isSubscribed = subscriptionStatus.isSelected();
+        String planType = getSelectedPlanType();
+
+        if (memberName.isEmpty() || email.isEmpty() || phone.isEmpty() || selectedTeam == null || planType == null) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill in all fields and select a team and subscription plan.");
             return;
         }
 
-        System.out.println("Selected Team ID: " + selectedTeam.getTeamID());
-        System.out.println("Selected Team Name: " + selectedTeam.getTeamName());
+        String insertMemberQuery = "INSERT INTO members (Name, Email, PhoneNumber, SubscriptionStatus, SubscriptionPlan) VALUES (?, ?, ?, ?, ?)";
+        String associateTeamQuery = "INSERT INTO team_members (MemberID, TeamID) VALUES (?, ?)";
+
+        try (Connection connection = DatabaseConnection.getInstance().getConnection()) {
+            connection.setAutoCommit(false); // Start transaction
+
+            // Step 1: Insert member into the `members` table
+            int memberID;
+            try (PreparedStatement memberStmt = connection.prepareStatement(insertMemberQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                memberStmt.setString(1, memberName);
+                memberStmt.setString(2, email);
+                memberStmt.setString(3, phone);
+                memberStmt.setBoolean(4, isSubscribed);
+                memberStmt.setString(5, planType);
+                memberStmt.executeUpdate();
+
+                ResultSet generatedKeys = memberStmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    memberID = generatedKeys.getInt(1);
+                } else {
+                    throw new SQLException("Failed to retrieve generated MemberID.");
+                }
+            }
+
+            // Step 2: Associate the member with the selected team
+            try (PreparedStatement teamMemberStmt = connection.prepareStatement(associateTeamQuery)) {
+                teamMemberStmt.setInt(1, memberID);
+                teamMemberStmt.setInt(2, selectedTeam.getTeamID());
+                teamMemberStmt.executeUpdate();
+            }
+
+            connection.commit(); // Commit transaction
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Member added and associated with the team successfully.");
+            Stage stage = (Stage) nameField.getScene().getWindow();
+            stage.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "An error occurred: " + e.getMessage());
+        }
     }
 
+    private String getSelectedPlanType() {
+        RadioButton selectedPlan = (RadioButton) planToggleGroup.getSelectedToggle();
+        return selectedPlan != null ? selectedPlan.getText().toLowerCase() : null;
+    }
 
     @FXML
-    private void handleCancel(ActionEvent event) {
+    private void handleCancel() {
         // Close the current window
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();

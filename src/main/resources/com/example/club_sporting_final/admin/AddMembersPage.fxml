@@ -10,7 +10,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.admin.Controller.AddMemberController" spacing="10" alignment="TOP_CENTER" prefHeight="500.0" prefWidth="600.0">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.club_sporting_final.admin.Controller.AddMemberController" spacing="10" alignment="TOP_CENTER" prefHeight="500.0" prefWidth="600.0">
     <!-- Title -->
     <Label text="Member Details" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
 
@@ -34,7 +35,7 @@
 
         <!-- Team Choice -->
         <Label text="Team:" GridPane.rowIndex="4" />
-        <ChoiceBox fx:id="teamChoice" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        <ChoiceBox fx:id="teamChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
         <!-- Subscription Plan -->
         <Label text="Subscription Plan:" GridPane.rowIndex="5" />
@@ -47,7 +48,7 @@
 
     <!-- Action Buttons -->
     <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button text="Save" onAction="#handleSave" />
-        <Button text="Cancel" onAction="#handleCancel" />
+        <Button fx:id="saveButton" text="Save" onAction="#handleSave" />
+        <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel" />
     </HBox>
 </VBox>

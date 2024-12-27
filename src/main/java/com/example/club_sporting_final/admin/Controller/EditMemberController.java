@@ -1,17 +1,18 @@
 package com.example.club_sporting_final.admin.Controller;
 
 import com.example.club_sporting_final.admin.module.Members;
+import com.example.club_sporting_final.admin.module.Team;
 import com.example.club_sporting_final.utils.DatabaseConnection;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class EditMemberController {
@@ -29,16 +30,16 @@ public class EditMemberController {
     private CheckBox subscriptionStatus;
 
     @FXML
-    private Button saveButton;
+    private ChoiceBox<Team> teamChoiceBox;
 
-    @FXML
-    private Button cancelButton;
+
 
     private Members member;
+    private ObservableList<Team> teamList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        // Add initialization logic if needed
+        loadTeams();
     }
 
     /**
@@ -54,6 +55,37 @@ public class EditMemberController {
         emailField.setText(member.getEmail());
         phoneField.setText(member.getPhoneNumber());
         subscriptionStatus.setSelected(member.isSubscriptionStatus());
+
+        // Select the current team in the ChoiceBox
+        if (member.getTeamID() != 0) { // If TeamID is not null (assuming 0 is the default for no team)
+            teamChoiceBox.getSelectionModel().select(getTeamById(member.getTeamID()));
+        }
+    }
+
+    /**
+     * Loads teams into the ChoiceBox.
+     */
+    private void loadTeams() {
+        try (Connection connection = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement("SELECT TeamID, TeamName FROM teams")) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                teamList.add(new Team(rs.getInt("TeamID"), rs.getString("TeamName"), null, null));
+            }
+            teamChoiceBox.setItems(teamList);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load teams: " + e.getMessage());
+        }
+    }
+
+    private Team getTeamById(int teamId) {
+        for (Team team : teamList) {
+            if (team.getTeamID() == teamId) {
+                return team;
+            }
+        }
+        return null;
     }
 
     /**
@@ -67,13 +99,17 @@ public class EditMemberController {
         String email = emailField.getText().trim();
         String phone = phoneField.getText().trim();
         boolean isSubscribed = subscriptionStatus.isSelected();
+        Team selectedTeam = teamChoiceBox.getValue();
 
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill in all fields.");
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill in all required fields.");
             return;
         }
 
         try (Connection connection = DatabaseConnection.getInstance().getConnection()) {
+            connection.setAutoCommit(false); // Start transaction
+
+            // Update member details
             String updateQuery = "UPDATE members SET Name = ?, Email = ?, PhoneNumber = ?, SubscriptionStatus = ? WHERE MemberID = ?";
             try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
                 stmt.setString(1, name);
@@ -81,15 +117,40 @@ public class EditMemberController {
                 stmt.setString(3, phone);
                 stmt.setBoolean(4, isSubscribed);
                 stmt.setInt(5, member.getMemberID());
+                stmt.executeUpdate();
+            }
 
-                int rowsUpdated = stmt.executeUpdate();
-                if (rowsUpdated > 0) {
-                    showAlert(Alert.AlertType.INFORMATION, "Success", "Member updated successfully.");
-                    closeWindow();
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to update member.");
+            // Update team association
+            if (selectedTeam != null) {
+                // Check if an entry already exists in `team_members`
+                String checkQuery = "SELECT COUNT(*) FROM team_members WHERE MemberID = ?";
+                try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+                    checkStmt.setInt(1, member.getMemberID());
+                    ResultSet rs = checkStmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        // Update existing entry
+                        String updateTeamQuery = "UPDATE team_members SET TeamID = ? WHERE MemberID = ?";
+                        try (PreparedStatement updateStmt = connection.prepareStatement(updateTeamQuery)) {
+                            updateStmt.setInt(1, selectedTeam.getTeamID());
+                            updateStmt.setInt(2, member.getMemberID());
+                            updateStmt.executeUpdate();
+                        }
+                    } else {
+                        // Insert new entry
+                        String insertTeamQuery = "INSERT INTO team_members (MemberID, TeamID) VALUES (?, ?)";
+                        try (PreparedStatement insertStmt = connection.prepareStatement(insertTeamQuery)) {
+                            insertStmt.setInt(1, member.getMemberID());
+                            insertStmt.setInt(2, selectedTeam.getTeamID());
+                            insertStmt.executeUpdate();
+                        }
+                    }
                 }
             }
+
+            connection.commit(); // Commit transaction
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Member updated successfully.");
+            closeWindow();
+
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Database Error", "An error occurred while updating the member: " + e.getMessage());

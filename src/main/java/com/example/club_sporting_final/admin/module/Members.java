@@ -9,29 +9,22 @@ public class Members {
     private final StringProperty email;
     private final StringProperty phoneNumber;
     private final BooleanProperty subscriptionStatus; // BooleanProperty for binding
+    private final IntegerProperty teamID;
 
-    // Default constructor
-
-    // Parameterized constructor
-
-
-    public Members(IntegerProperty memberID, StringProperty name, StringProperty email, StringProperty phoneNumber, BooleanProperty subscriptionStatus) {
-        this.memberID = memberID;
-        this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.subscriptionStatus = subscriptionStatus;
-    }
-
-    public Members(int memberID, String name, String email, String phoneNumber, boolean subscriptionStatus) {
+    // Constructor for full initialization
+    public Members(int memberID, String name, String email, String phoneNumber, boolean subscriptionStatus, int teamID) {
         this.memberID = new SimpleIntegerProperty(memberID);
         this.name = new SimpleStringProperty(name);
         this.email = new SimpleStringProperty(email);
         this.phoneNumber = new SimpleStringProperty(phoneNumber);
         this.subscriptionStatus = new SimpleBooleanProperty(subscriptionStatus);
-
+        this.teamID = new SimpleIntegerProperty(teamID);
     }
 
+    // Constructor without teamID (legacy support or when teamID is not required)
+    public Members(int memberID, String name, String email, String phoneNumber, boolean subscriptionStatus) {
+        this(memberID, name, email, phoneNumber, subscriptionStatus, 0); // Default teamID to 0
+    }
 
     // Getters and setters for memberID
     public int getMemberID() {
@@ -98,6 +91,19 @@ public class Members {
         return subscriptionStatus;
     }
 
+    // Getters and setters for teamID
+    public int getTeamID() {
+        return teamID.get();
+    }
+
+    public void setTeamID(int teamID) {
+        this.teamID.set(teamID);
+    }
+
+    public IntegerProperty teamIDProperty() {
+        return teamID;
+    }
+
     @Override
     public String toString() {
         return "Member{" +
@@ -106,8 +112,7 @@ public class Members {
                 ", email='" + getEmail() + '\'' +
                 ", phoneNumber='" + getPhoneNumber() + '\'' +
                 ", subscriptionStatus=" + (isSubscriptionStatus() ? "Active" : "Inactive") +
+                ", teamID=" + getTeamID() +
                 '}';
     }
-
-
 }
