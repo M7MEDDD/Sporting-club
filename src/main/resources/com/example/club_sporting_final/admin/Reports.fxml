@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.club_sporting_final.admin.Controller.ReportsController"
+            prefHeight="600.0" prefWidth="800.0">
+
+    <VBox spacing="10" prefWidth="800.0" prefHeight="600.0" alignment="TOP_CENTER" AnchorPane.topAnchor="10.0">
+        <Label text="Reports" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+        <!-- Total Income and Expenses Section -->
+        <HBox spacing="20" alignment="CENTER">
+            <VBox spacing="5" alignment="CENTER">
+                <Label text="Total Income" />
+                <Label fx:id="totalIncomeLabel" text="0.0" style="-fx-font-size: 16px;" />
+            </VBox>
+            <VBox spacing="5" alignment="CENTER">
+                <Label text="Total Expenses" />
+                <Label fx:id="totalExpensesLabel" text="0.0" style="-fx-font-size: 16px;" />
+            </VBox>
+            <VBox spacing="5" alignment="CENTER">
+                <Label text="Net Balance" />
+                <Label fx:id="netBalanceLabel" text="0.0" style="-fx-font-size: 16px;" />
+            </VBox>
+        </HBox>
+
+        <!-- Filters and Sorting Section -->
+        <HBox spacing="20" alignment="CENTER">
+            <Label text="Filter By:" />
+            <ChoiceBox fx:id="filterChoiceBox" prefWidth="150.0" />
+            <Button text="Apply Filter" onAction="#handleApplyFilter" />
+        </HBox>
+
+        <!-- Reports Table Section -->
+        <TableView fx:id="reportsTable" prefWidth="780.0" prefHeight="400.0">
+            <columns>
+                <TableColumn fx:id="columnName" text="Name" prefWidth="200.0" />
+                <TableColumn fx:id="columnCategory" text="Category" prefWidth="150.0" />
+                <TableColumn fx:id="columnAmount" text="Amount" prefWidth="150.0" />
+                <TableColumn fx:id="columnDate" text="Date" prefWidth="150.0" />
+                <TableColumn fx:id="columnDetails" text="Details" prefWidth="130.0" />
+            </columns>
+        </TableView>
+    </VBox>
+</AnchorPane>

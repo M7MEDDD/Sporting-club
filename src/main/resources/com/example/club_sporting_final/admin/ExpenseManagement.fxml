@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.club_sporting_final.admin.Controller.ExpenseManagementController"
+            prefHeight="400.0" prefWidth="600.0">
+    <VBox spacing="10" alignment="CENTER" AnchorPane.topAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+        <TableView fx:id="expenseTable" prefHeight="200.0" prefWidth="580.0">
+            <columns>
+                <TableColumn fx:id="expenseIDColumn" text="Expense ID" prefWidth="100.0" />
+                <TableColumn fx:id="expenseTypeColumn" text="Expense Type" prefWidth="150.0" />
+                <TableColumn fx:id="amountColumn" text="Amount" prefWidth="100.0" />
+                <TableColumn fx:id="dateColumn" text="Date" prefWidth="130.0" />
+                <TableColumn fx:id="teamIDColumn" text="Team ID" prefWidth="100.0" />
+            </columns>
+        </TableView>
+
+        <GridPane hgap="10" vgap="10">
+            <Label text="Expense Type:" />
+            <TextField fx:id="expenseTypeField" GridPane.columnIndex="1" />
+            <Label text="Amount:" GridPane.rowIndex="1" />
+            <TextField fx:id="amountField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label text="Date:" GridPane.rowIndex="2" />
+            <DatePicker fx:id="datePicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Team ID:" GridPane.rowIndex="3" />
+            <TextField fx:id="teamIDField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        </GridPane>
+
+        <HBox spacing="10" alignment="CENTER">
+            <Button fx:id="addButton" text="Add Expense" onAction="#handleAddExpense" />
+            <Button fx:id="editButton" text="Edit Expense" onAction="#handleEditExpense" />
+            <Button fx:id="deleteButton" text="Delete Expense" onAction="#handleDeleteExpense" />
+            <Button fx:id="clearButton" text="Clear Fields" onAction="#handleClearFields" />
+        </HBox>
+    </VBox>
+</AnchorPane>
+

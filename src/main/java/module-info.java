@@ -15,8 +15,7 @@ module com.example.club_sporting_final {
     exports com.example.club_sporting_final;
     opens com.example.club_sporting_final.login.Controller to javafx.fxml;
     opens com.example.club_sporting_final.admin.Controller to javafx.fxml;
-    opens com.example.club_sporting_final.admin.module to javafx.fxml;
 
-
+    // Open admin.module to javafx.base for runtime reflection
+    opens com.example.club_sporting_final.admin.module to javafx.fxml, javafx.base;
 }
-

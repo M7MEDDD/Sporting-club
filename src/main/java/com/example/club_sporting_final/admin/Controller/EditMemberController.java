@@ -32,8 +32,6 @@ public class EditMemberController {
     @FXML
     private ChoiceBox<Team> teamChoiceBox;
 
-
-
     private Members member;
     private ObservableList<Team> teamList = FXCollections.observableArrayList();
 
@@ -57,7 +55,7 @@ public class EditMemberController {
         subscriptionStatus.setSelected(member.isSubscriptionStatus());
 
         // Select the current team in the ChoiceBox
-        if (member.getTeamID() != 0) { // If TeamID is not null (assuming 0 is the default for no team)
+        if (member.getTeamID() != 0) { // Assuming 0 indicates no team
             teamChoiceBox.getSelectionModel().select(getTeamById(member.getTeamID()));
         }
     }
@@ -110,41 +108,15 @@ public class EditMemberController {
             connection.setAutoCommit(false); // Start transaction
 
             // Update member details
-            String updateQuery = "UPDATE members SET Name = ?, Email = ?, PhoneNumber = ?, SubscriptionStatus = ? WHERE MemberID = ?";
+            String updateQuery = "UPDATE members SET Name = ?, Email = ?, PhoneNumber = ?, SubscriptionStatus = ?, TeamID = ? WHERE MemberID = ?";
             try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
                 stmt.setString(1, name);
                 stmt.setString(2, email);
                 stmt.setString(3, phone);
                 stmt.setBoolean(4, isSubscribed);
-                stmt.setInt(5, member.getMemberID());
+                stmt.setInt(5, selectedTeam != null ? selectedTeam.getTeamID() : 0); // Set 0 if no team selected
+                stmt.setInt(6, member.getMemberID());
                 stmt.executeUpdate();
-            }
-
-            // Update team association
-            if (selectedTeam != null) {
-                // Check if an entry already exists in `team_members`
-                String checkQuery = "SELECT COUNT(*) FROM team_members WHERE MemberID = ?";
-                try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
-                    checkStmt.setInt(1, member.getMemberID());
-                    ResultSet rs = checkStmt.executeQuery();
-                    if (rs.next() && rs.getInt(1) > 0) {
-                        // Update existing entry
-                        String updateTeamQuery = "UPDATE team_members SET TeamID = ? WHERE MemberID = ?";
-                        try (PreparedStatement updateStmt = connection.prepareStatement(updateTeamQuery)) {
-                            updateStmt.setInt(1, selectedTeam.getTeamID());
-                            updateStmt.setInt(2, member.getMemberID());
-                            updateStmt.executeUpdate();
-                        }
-                    } else {
-                        // Insert new entry
-                        String insertTeamQuery = "INSERT INTO team_members (MemberID, TeamID) VALUES (?, ?)";
-                        try (PreparedStatement insertStmt = connection.prepareStatement(insertTeamQuery)) {
-                            insertStmt.setInt(1, member.getMemberID());
-                            insertStmt.setInt(2, selectedTeam.getTeamID());
-                            insertStmt.executeUpdate();
-                        }
-                    }
-                }
             }
 
             connection.commit(); // Commit transaction
