@@ -8,7 +8,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.FileChooser;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,6 +26,9 @@ public class ReportsController {
 
     @FXML
     private Label totalExpensesLabel;
+    @FXML
+    private Button generateReportButton;
+
 
     @FXML
     private Label netBalanceLabel;
@@ -58,7 +66,7 @@ public class ReportsController {
         columnDetails.setCellValueFactory(new PropertyValueFactory<>("details"));
 
         // Load filters into ChoiceBox
-        filterChoiceBox.setItems(FXCollections.observableArrayList("All", "Subscriptions", "Expenses", "Teams", "Members"));
+        filterChoiceBox.setItems(FXCollections.observableArrayList("All", "Subscriptions", "Expenses"));
         filterChoiceBox.setValue("All");
 
         // Load initial data
@@ -69,6 +77,7 @@ public class ReportsController {
     private void loadReportsData() {
         reportItems.clear();
 
+        // Query to fetch subscriptions and expenses
         String query = "SELECT " +
                 "    MemberID AS Name, " +
                 "    'Income' AS Category, " +
@@ -83,23 +92,33 @@ public class ReportsController {
                 "    Amount, " +
                 "    Date, " +
                 "    'Expense Details' AS Details " +
-                "FROM expenses;";
+                "FROM expenses";
 
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
+
             ResultSet rs = stmt.executeQuery();
+
+            // Iterate through result set and add data to reportItems list
             while (rs.next()) {
-                reportItems.add(new ReportItem(
-                        rs.getString("Name"),
-                        rs.getString("Category"),
-                        rs.getDouble("Amount"),
-                        rs.getString("Date"),
-                        rs.getString("Details")
-                ));
+                String name = rs.getString("Name");
+                String category = rs.getString("Category");
+                double amount = rs.getDouble("Amount");
+                String date = rs.getString("Date");
+                String details = rs.getString("Details");
+
+                // Debugging: Print data to console to verify
+                System.out.println("Name: " + name + ", Category: " + category + ", Amount: " + amount + ", Date: " + date + ", Details: " + details);
+
+                // Add to reportItems list
+                reportItems.add(new ReportItem(name, category, amount, date, details));
             }
+
+            // Set the list to the TableView
             reportsTable.setItems(reportItems);
 
         } catch (SQLException e) {
+            e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load reports data: " + e.getMessage());
         }
     }
@@ -124,18 +143,100 @@ public class ReportsController {
     }
 
     @FXML
+    private void handleGenerateReport() {
+        // Open a FileChooser for the user to select where to save the file
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Report");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+
+        // Show save dialog
+        File file = fileChooser.showSaveDialog(reportsTable.getScene().getWindow());
+
+        if (file != null) {
+            saveReportToFile(file);
+        }
+    }
+
+    private void saveReportToFile(File file) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            // Write header
+            writer.write("Name,Category,Amount,Date,Details");
+            writer.newLine();
+
+            // Write each report item
+            for (ReportItem item : reportItems) {
+                writer.write(String.format("%s,%s,%.2f,%s,%s",
+                        item.getName(),
+                        item.getCategory(),
+                        item.getAmount(),
+                        item.getDate(),
+                        item.getDetails()));
+                writer.newLine();
+            }
+
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Report saved successfully!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Could not save the report: " + e.getMessage());
+        }
+    }
+
+    @FXML
     private void handleApplyFilter(ActionEvent event) {
+        // Get the selected filter from the ChoiceBox
         String selectedFilter = filterChoiceBox.getValue();
+
+        // Create a list to store filtered items
         ObservableList<ReportItem> filteredItems = FXCollections.observableArrayList();
 
+        // Apply filtering logic based on the selected filter
         for (ReportItem item : reportItems) {
-            if (selectedFilter.equals("All") || item.getCategory().equalsIgnoreCase(selectedFilter)) {
+            if ("All".equals(selectedFilter)) {
+                // Add all items if "All" is selected
+                filteredItems.add(item);
+            } else if ("Subscriptions".equalsIgnoreCase(selectedFilter) && "Income".equalsIgnoreCase(item.getCategory())) {
+                // Add only "Income" items for Subscriptions filter
+                filteredItems.add(item);
+            } else if ("Expenses".equalsIgnoreCase(selectedFilter) && "Expense".equalsIgnoreCase(item.getCategory())) {
+                // Add only "Expense" items for Expenses filter
                 filteredItems.add(item);
             }
         }
 
+        // Sort the filtered list
+        filteredItems.sort((item1, item2) -> {
+            // Sort by amount in descending order
+            return Double.compare(item2.getAmount(), item1.getAmount());
+        });
+
+        // Update the table with the filtered and sorted data
         reportsTable.setItems(filteredItems);
+
+        // Optionally, update the totals for the filtered items
+        updateFilteredTotals(filteredItems);
     }
+
+    // Helper function to update totals for the filtered items
+    private void updateFilteredTotals(ObservableList<ReportItem> filteredItems) {
+        double totalIncome = 0;
+        double totalExpenses = 0;
+
+        for (ReportItem item : filteredItems) {
+            if ("Income".equalsIgnoreCase(item.getCategory())) {
+                totalIncome += item.getAmount();
+            } else if ("Expense".equalsIgnoreCase(item.getCategory())) {
+                totalExpenses += item.getAmount();
+            }
+        }
+
+        // Update labels with the filtered totals
+        totalIncomeLabel.setText(String.format("%.2f", totalIncome));
+        totalExpensesLabel.setText(String.format("%.2f", totalExpenses));
+        netBalanceLabel.setText(String.format("%.2f", totalIncome - totalExpenses));
+    }
+
+
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);

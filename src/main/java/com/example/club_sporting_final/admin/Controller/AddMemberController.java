@@ -90,20 +90,20 @@ public class AddMemberController {
             return;
         }
 
-        String insertMemberQuery = "INSERT INTO members (Name, Email, PhoneNumber, SubscriptionStatus, SubscriptionPlan) VALUES (?, ?, ?, ?, ?)";
+        String insertMemberQuery = "INSERT INTO members (Name, Email, PhoneNumber) VALUES (?, ?, ?)";
         String associateTeamQuery = "INSERT INTO team_members (MemberID, TeamID) VALUES (?, ?)";
+        String insertSubscriptionQuery = "INSERT INTO subscriptions (MemberID, PlanType, StartDate, EndDate, Amount) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConnection.getInstance().getConnection()) {
             connection.setAutoCommit(false); // Start transaction
 
-            // Step 1: Insert member into the `members` table
             int memberID;
+
+            // Step 1: Insert member into the `members` table
             try (PreparedStatement memberStmt = connection.prepareStatement(insertMemberQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 memberStmt.setString(1, memberName);
                 memberStmt.setString(2, email);
                 memberStmt.setString(3, phone);
-                memberStmt.setBoolean(4, isSubscribed);
-                memberStmt.setString(5, planType);
                 memberStmt.executeUpdate();
 
                 ResultSet generatedKeys = memberStmt.getGeneratedKeys();
@@ -121,8 +121,24 @@ public class AddMemberController {
                 teamMemberStmt.executeUpdate();
             }
 
+            // Step 3: Insert subscription data into the `subscriptions` table if subscribed
+            if (isSubscribed) {
+                String startDate = java.time.LocalDate.now().toString();
+                String endDate = calculateEndDate(startDate, planType);
+                double amount = calculateSubscriptionAmount(planType);
+
+                try (PreparedStatement subscriptionStmt = connection.prepareStatement(insertSubscriptionQuery)) {
+                    subscriptionStmt.setInt(1, memberID);
+                    subscriptionStmt.setString(2, planType);
+                    subscriptionStmt.setString(3, startDate);
+                    subscriptionStmt.setString(4, endDate);
+                    subscriptionStmt.setDouble(5, amount);
+                    subscriptionStmt.executeUpdate();
+                }
+            }
+
             connection.commit(); // Commit transaction
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Member added and associated with the team successfully.");
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Member and subscription added successfully.");
             Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
 
@@ -135,6 +151,33 @@ public class AddMemberController {
     private String getSelectedPlanType() {
         RadioButton selectedPlan = (RadioButton) planToggleGroup.getSelectedToggle();
         return selectedPlan != null ? selectedPlan.getText().toLowerCase() : null;
+    }
+
+    private String calculateEndDate(String startDate, String planType) {
+        java.time.LocalDate start = java.time.LocalDate.parse(startDate);
+        switch (planType) {
+            case "monthly":
+                return start.plusMonths(1).toString();
+            case "quarterly":
+                return start.plusMonths(3).toString();
+            case "yearly":
+                return start.plusYears(1).toString();
+            default:
+                throw new IllegalArgumentException("Invalid plan type: " + planType);
+        }
+    }
+
+    private double calculateSubscriptionAmount(String planType) {
+        switch (planType) {
+            case "monthly":
+                return 50.0;
+            case "quarterly":
+                return 150.0;
+            case "yearly":
+                return 500.0;
+            default:
+                throw new IllegalArgumentException("Invalid plan type: " + planType);
+        }
     }
 
     @FXML

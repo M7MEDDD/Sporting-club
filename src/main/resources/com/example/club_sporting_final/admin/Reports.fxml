@@ -46,5 +46,10 @@
                 <TableColumn fx:id="columnDetails" text="Details" prefWidth="130.0" />
             </columns>
         </TableView>
+
+        <!-- Generate Report Button -->
+        <HBox spacing="20" alignment="CENTER">
+            <Button text="Generate Report" onAction="#handleGenerateReport" />
+        </HBox>
     </VBox>
 </AnchorPane>

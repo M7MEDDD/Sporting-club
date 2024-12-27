@@ -1,0 +1,26 @@
+Club Sporting Financial Report
+====================================
+Total Income: 2550.00
+Total Expenses: 3200.00
+Net Balance: -650.00
+
+Details:
+Name, Category, Amount, Date, Details
+1, Income, 50.00, 2024-01-01, Subscription
+1, Expense, 300.00, 2024-01-05, Expense Details
+10, Income, 50.00, 2024-12-26, Subscription
+11, Income, 50.00, 2024-12-26, Subscription
+13, Income, 150.00, 2024-12-26, Subscription
+17, Income, 500.00, 2024-12-27, Subscription
+2, Income, 500.00, 2024-01-01, Subscription
+2, Expense, 500.00, 2024-01-10, Expense Details
+3, Income, 150.00, 2024-01-01, Subscription
+3, Expense, 200.00, 2024-01-15, Expense Details
+4, Income, 50.00, 2024-01-01, Subscription
+4, Expense, 700.00, 2024-01-20, Expense Details
+5, Income, 500.00, 2024-01-01, Subscription
+5, Expense, 100.00, 2024-01-25, Expense Details
+6, Expense, 400.00, 2024-12-01, Expense Details
+7, Expense, 1000.00, 2024-12-27, Expense Details
+8, Income, 50.00, 2024-12-25, Subscription
+9, Income, 500.00, 2024-12-25, Subscription
