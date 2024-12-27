@@ -165,6 +165,34 @@ public class TeamManagementController {
         }
     }
 
+    @FXML
+    private void editTeam() {
+        Team selectedTeam = teamTable.getSelectionModel().getSelectedItem();
+        if (selectedTeam == null) {
+            showAlert(Alert.AlertType.WARNING, "No Selection", "Please select a team to edit.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/club_sporting_final/admin/EditTeamPage.fxml"));
+            Parent root = loader.load();
+
+            EditTeamController controller = loader.getController();
+            controller.setTeam(selectedTeam);
+
+            Stage stage = new Stage();
+            stage.setTitle("Edit Team");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            loadTeams(); // Reload teams after editing
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not open Edit Team page.");
+        }
+    }
+
+
     private void showAlert(Alert.AlertType alertType, String title, String content) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);

@@ -52,6 +52,13 @@ public class EditTeamController {
         }
     }
 
+    @FXML
+    private void handleCancel(ActionEvent event) {
+        Stage stage = (Stage) teamNameField.getScene().getWindow();
+        stage.close();
+    }
+
+
     private void updateTeamInDatabase(Team team) {
         String query = "UPDATE Teams SET TeamName = ?, CoachName = ?, Category = ? WHERE TeamID = ?";
         try (Connection connection = DatabaseConnection.getInstance().getConnection();

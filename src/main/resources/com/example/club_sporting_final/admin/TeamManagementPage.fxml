@@ -33,7 +33,7 @@
     <!-- Action Buttons -->
     <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding: 10;">
         <Button fx:id="addButton" onAction="#addTeam" text="Add Team" />
-        <Button fx:id="editButton" text="Edit Team" />
+        <Button fx:id="editButton" onAction="#editTeam" text="Edit Team" />
         <Button fx:id="deleteButton" onAction="#deleteTeam" text="Delete Team" />
     </HBox>
 </VBox>

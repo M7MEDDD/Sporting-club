@@ -20,7 +20,7 @@ public class AddTeamController {
     private TextField coachNameField;
 
     @FXML
-    private ChoiceBox<String> categoryChoiceBox;
+    private ComboBox<String> categoryComboBox;
 
     @FXML
     private Button saveButton, cancelButton;
@@ -31,19 +31,28 @@ public class AddTeamController {
     public void initialize() {
         // Initialize categories
         ObservableList<String> categories = FXCollections.observableArrayList("Football", "Fitness", "Swimming");
-        categoryChoiceBox.setItems(categories);
-        categoryChoiceBox.setValue("Football"); // Default value
+        categoryComboBox.setItems(categories);
+        categoryComboBox.setEditable(true); // Allow users to type a new category
+        categoryComboBox.setValue("Football"); // Default value
     }
 
     @FXML
     private void handleSave() {
         String teamName = teamNameField.getText().trim();
         String coachName = coachNameField.getText().trim();
-        String category = categoryChoiceBox.getValue();
+        String category = categoryComboBox.getValue().trim();
 
         // Validate inputs
-        if (teamName.isEmpty() || coachName.isEmpty() || category == null) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill in all fields.");
+        if (teamName.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Team name cannot be empty.");
+            return;
+        }
+        if (coachName.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Coach name cannot be empty.");
+            return;
+        }
+        if (category.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Category cannot be empty.");
             return;
         }
 
@@ -65,7 +74,7 @@ public class AddTeamController {
                 Stage stage = (Stage) saveButton.getScene().getWindow();
                 stage.close();
             } else {
-                showAlert(Alert.AlertType.ERROR, "Error", "Failed to add the team.");
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to add the team. Please try again.");
             }
 
         } catch (SQLException e) {

@@ -23,7 +23,7 @@
             <!-- Category -->
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Category:" />
-                <ChoiceBox fx:id="categoryChoiceBox" prefWidth="150" />
+                <ComboBox fx:id="categoryComboBox" promptText="Select or type a category"/>
             </HBox>
 
             <!-- Buttons -->

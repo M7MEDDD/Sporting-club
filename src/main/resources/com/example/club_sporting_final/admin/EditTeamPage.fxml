@@ -13,6 +13,13 @@
 
                 <Label text="Team Leader ID:" GridPane.rowIndex="1"/>
                 <TextField fx:id="teamLeaderIDField" promptText="Edit team leader ID" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Coach Name:" GridPane.rowIndex="2"/>
+                <TextField fx:id="coachNameField" promptText="Edit coach name" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                <Label text="Category:" GridPane.rowIndex="3"/>
+                <ChoiceBox fx:id="categoryChoiceBox" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
             </GridPane>
             <HBox spacing="10" alignment="CENTER_RIGHT">
                 <Button text="Save" onAction="#handleSave"/>
