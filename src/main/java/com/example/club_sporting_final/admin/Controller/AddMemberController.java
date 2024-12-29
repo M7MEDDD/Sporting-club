@@ -1,7 +1,10 @@
 package com.example.club_sporting_final.admin.Controller;
 
+import com.example.club_sporting_final.admin.module.Members;
 import com.example.club_sporting_final.admin.module.Team;
 import com.example.club_sporting_final.utils.DatabaseConnection;
+import com.example.club_sporting_final.utils.EmailSender;
+import jakarta.mail.MessagingException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -139,6 +142,9 @@ public class AddMemberController {
                     subStmt.setDouble(5, amount);
                     subStmt.executeUpdate();
                 }
+
+                // Send subscription email
+                sendSubscriptionEmail(name, email, planType, startDate, endDate);
             }
 
             connection.commit();
@@ -188,6 +194,31 @@ public class AddMemberController {
             default -> 0.0;
         };
     }
+
+    private void sendSubscriptionEmail(String name, String email, String planType, String startDate, String endDate) {
+        if (email == null || email.isBlank()) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Email address is missing.");
+            return;
+        }
+        if (!email.matches("\\S+@\\S+\\.\\S+")) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Invalid email format: " + email);
+            return;
+        }
+
+        String subject = "Welcome to Club Sporting!";
+        String messageBody = String.format(
+                "Dear %s,\n\nThank you for subscribing to our %s plan.\nYour subscription starts on %s and ends on %s.\n\nBest regards,\nClub Sporting Team",
+                name, planType, startDate, endDate
+        );
+
+        try {
+            EmailSender.sendEmail(email, subject, messageBody);
+        } catch (MessagingException e) {
+            showAlert(Alert.AlertType.ERROR, "Email Error", "Failed to send subscription email: " + e.getMessage());
+        }
+    }
+
+
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);

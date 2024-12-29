@@ -9,6 +9,7 @@ module com.example.club_sporting_final {
     requires net.synedra.validatorfx;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires jakarta.mail;
 
     exports com.example.club_sporting_final.utils;
     opens com.example.club_sporting_final.utils to javafx.fxml;

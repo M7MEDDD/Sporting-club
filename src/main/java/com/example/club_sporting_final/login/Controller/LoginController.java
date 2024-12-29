@@ -30,7 +30,7 @@ public class LoginController {
     @FXML
     private void handleLogin() {
         String username = usernameField.getText().trim();
-        String password = passwordField.getText().trim(); // Use raw password directly
+        String password = passwordField.getText().trim();
 
         // Debugging: Print username and raw password
         System.out.println("Username: " + username);
@@ -58,11 +58,11 @@ public class LoginController {
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, username);
-            stmt.setString(2, password); // Use raw password as provided by the user
+            stmt.setString(2, password);
             System.out.println("Executing query: " + stmt);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return rs.getString("role"); // Return the role of the user
+                return rs.getString("role");
             }
         } catch (Exception e) {
             System.err.println("Error validating credentials: " + e.getMessage());
