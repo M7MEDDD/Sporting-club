@@ -51,7 +51,6 @@ public class MemberManagementController {
 
     @FXML
     public void initialize() {
-        // Initialize TableView columns
         idColumn.setCellValueFactory(data -> data.getValue().memberIDProperty().asObject());
         nameColumn.setCellValueFactory(data -> data.getValue().nameProperty());
         emailColumn.setCellValueFactory(data -> data.getValue().emailProperty());
@@ -59,10 +58,8 @@ public class MemberManagementController {
         statusColumn.setCellValueFactory(data -> new SimpleStringProperty(
                 data.getValue().isSubscriptionStatus() ? "Active" : "Inactive"));
 
-        // Load data into TableView
         loadMembers();
 
-        // Set button actions
         addButton.setOnAction(e -> openAddMemberForm());
         editButton.setOnAction(e -> openEditMemberForm());
         deleteButton.setOnAction(e -> deleteMember());
@@ -87,6 +84,7 @@ public class MemberManagementController {
                         subscriptionStatus
                 ));
             }
+            System.out.println("Members loaded successfully. Total: " + memberList.size());
         } catch (SQLException e) {
             showError("Database Error", "Could not load members: " + e.getMessage());
         }
@@ -102,12 +100,17 @@ public class MemberManagementController {
         }
 
         memberList.clear();
-        String query = "SELECT MemberID, Name, Email, PhoneNumber, SubscriptionStatus FROM Members WHERE MemberID = ? OR Name LIKE ?";
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-
-            stmt.setString(1, searchQuery);
-            stmt.setString(2, "%" + searchQuery + "%");
+        String queryById = "SELECT MemberID, Name, Email, PhoneNumber, SubscriptionStatus FROM Members WHERE MemberID = ?";
+        String queryByName = "SELECT MemberID, Name, Email, PhoneNumber, SubscriptionStatus FROM Members WHERE Name LIKE ?";
+        try (Connection connection = DatabaseConnection.getInstance().getConnection()) {
+            PreparedStatement stmt;
+            if (searchQuery.matches("\\d+")) {
+                stmt = connection.prepareStatement(queryById);
+                stmt.setInt(1, Integer.parseInt(searchQuery));
+            } else {
+                stmt = connection.prepareStatement(queryByName);
+                stmt.setString(1, "%" + searchQuery + "%");
+            }
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -126,7 +129,7 @@ public class MemberManagementController {
             }
 
         } catch (SQLException e) {
-            showError("Database Error", "An error occurred while searching for members: " + e.getMessage());
+            showError("Database Error", "An error occurred while searching: " + e.getMessage());
         }
 
         memberTable.setItems(memberList);
@@ -155,9 +158,9 @@ public class MemberManagementController {
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
-            loadMembers(); // Reload after editing
+            loadMembers();
         } catch (IOException e) {
-            showError("Navigation Error", "Could not open the Edit Member page.");
+            showError("Navigation Error", "Could not open Edit Member page: " + e.getMessage());
         }
     }
 
@@ -181,13 +184,13 @@ public class MemberManagementController {
                 int rowsDeleted = stmt.executeUpdate();
 
                 if (rowsDeleted > 0) {
-                    memberList.remove(selectedMember); // Update the TableView
+                    memberList.remove(selectedMember);
                     showAlert(Alert.AlertType.INFORMATION, "Success", "Member deleted successfully.");
                 } else {
-                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to delete the member.");
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to delete member.");
                 }
             } catch (SQLException e) {
-                showError("Database Error", "An error occurred while deleting the member: " + e.getMessage());
+                showError("Database Error", "Error deleting member: " + e.getMessage());
             }
         }
     }
@@ -209,7 +212,7 @@ public class MemberManagementController {
 
             loadMembers();
         } catch (IOException e) {
-            showError("Navigation Error", "Could not open the requested form.");
+            showError("Navigation Error", "Could not open the requested form: " + e.getMessage());
         }
     }
 
