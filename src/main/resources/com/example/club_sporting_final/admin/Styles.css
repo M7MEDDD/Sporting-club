@@ -5,7 +5,7 @@
 
 /* Labels */
 .label {
-    -fx-text-fill: #000000; /* Light grey text */
+    -fx-text-fill: #e0e0e0; /* Light gray text for better readability */
     -fx-font-size: 14px;
 }
 
@@ -28,6 +28,8 @@
 
 .text-field:focused, .combo-box:focused, .choice-box:focused {
     -fx-border-color: #ffa726; /* Highlighted orange border on focus */
+    -fx-background-color: #3c3f41;
+    -fx-effect: dropshadow(gaussian, rgba(255,165,0,0.5), 6, 0.3, 0, 2);
 }
 
 .text-field:hover, .combo-box:hover, .choice-box:hover {
@@ -42,15 +44,18 @@
     -fx-background-radius: 8;
     -fx-padding: 8 16;
     -fx-font-size: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0.3, 0, 2);
 }
 
 .button:hover {
     -fx-background-color: #ffa726; /* Highlight in orange on hover */
     -fx-text-fill: #000000; /* Black text for contrast */
+    -fx-effect: dropshadow(gaussian, rgba(255,165,0,0.5), 6, 0.3, 0, 4); /* Slight shadow effect */
 }
 
 .button:pressed {
-    -fx-background-color: #ff7043; /* Slightly darker orange when pressed */
+    -fx-background-color: #ff7043; /* Slightly darker orange */
+    -fx-text-fill: #000000; /* Black text */
 }
 
 /* Checkboxes and Radio Buttons */
@@ -87,6 +92,11 @@
     -fx-text-fill: #ffffff; /* Ensure text remains white */
 }
 
+.table-row-cell:hover {
+    -fx-background-color: #607d8b; /* Grey background on hover */
+    -fx-text-fill: white;
+}
+
 .table-row-cell:selected {
     -fx-background-color: #ffa726; /* Highlight selected row in orange */
     -fx-text-fill: #000000; /* Black text for contrast */
@@ -107,6 +117,7 @@
 
 .scroll-bar .thumb:hover {
     -fx-background-color: #ffa726; /* Highlight scrollbar on hover */
+    -fx-effect: dropshadow(gaussian, rgba(255,165,0,0.5), 4, 0.3, 0, 2);
 }
 
 /* Tooltip */
@@ -114,27 +125,27 @@
     -fx-background-color: #3c3f41;
     -fx-text-fill: #ffffff;
     -fx-border-color: #555555;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 4, 0.3, 0, 2);
 }
 
 /* Dialogs and Alerts */
 .dialog-pane {
     -fx-background-color: #2b2b2b; /* Dark background for dialogs */
     -fx-border-color: #555555;
-    -fx-header-color: #ffa726; /* Highlighted headers */
+    -fx-border-radius: 8;
 }
 
 .dialog-pane .header-panel {
-    -fx-background-color: #3c3f41;
-    -fx-text-fill: #e0e0e0;
+    -fx-background-color: #607d8b; /* Grey header */
+    -fx-text-fill: white;
 }
 
 .dialog-pane .content {
-    -fx-background-color: #2b2b2b;
-    -fx-text-fill: #e0e0e0;
+    -fx-text-fill: white; /* White text */
 }
 
 .dialog-pane .button-bar .button {
-    -fx-background-color: #607d8b;
+    -fx-background-color: #607d8b; /* Grey buttons */
     -fx-text-fill: white;
 }
 
@@ -164,6 +175,9 @@
 .tab-pane .tab:selected {
     -fx-background-color: #ffa726; /* Orange selected tab */
     -fx-text-fill: #000000; /* Black text for contrast */
+    -fx-effect: dropshadow(gaussian, rgba(255,165,0,0.7), 4, 0.3, 0, 2);
+    -fx-border-color: #ff7043; /* Subtle border */
+    -fx-border-width: 1;
 }
 
 /* MenuBar */
@@ -180,11 +194,46 @@
     -fx-background-color: #607d8b;
 }
 
-/* ProgressBar */
-.progress-bar {
+/* ProgressBar and ProgressIndicator */
+.progress-bar, .progress-indicator {
     -fx-accent: #ffa726; /* Orange progress color */
     -fx-background-color: #3c3f41;
     -fx-border-color: #555555;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
+}
+
+/* Chart Styles */
+.chart {
+    -fx-background-color: transparent;
+}
+
+.chart-title {
+    -fx-text-fill: #ffffff; /* Bright white for better contrast */
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.axis-label {
+    -fx-text-fill: #ffffff; /* Bright white for axis labels */
+    -fx-font-size: 14px;
+}
+
+.axis {
+    -fx-tick-label-fill: #ffffff; /* Bright white for tick labels */
+    -fx-label-fill: #ffffff; /* Bright white for axis labels */
+}
+
+.legend {
+    -fx-background-color: transparent; /* Transparent background for legend */
+    -fx-text-fill: #000000; /* Bright white for legend text */
+}
+
+.legend-item-symbol {
+    -fx-background-color: rgba(255, 255, 255, 0); /* Match background */
+}
+
+/* Additional Global Label Styles */
+.label {
+    -fx-text-fill: #000000; /* White text globally for labels */
 }

@@ -1,44 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.admin.Controller.DashboardController">
-   <top>
-      <HBox alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="600.0" spacing="10" style="-fx-alignment: center;" styleClass="header">
-         <children>
-            <Label styleClass="app-title" text="Sporting Club Management" />
-         </children>
-      </HBox>
-   </top>
-   <left>
-      <VBox prefHeight="367.0" prefWidth="232.0" spacing="20" style="-fx-alignment: center;" styleClass="nav-pane">
-         <children>
-            <Button onAction="#goToMemberManagement" prefHeight="44.0" prefWidth="200.0" text="Member Management" />
-            <Button onAction="#goToTeamManagement" prefHeight="44.0" prefWidth="200.0" text="Team Management" />
-            <Button layoutX="30.0" layoutY="71.0" onAction="#goToSubscriptionsManagement" prefHeight="46.0" prefWidth="200.0" text="Subscriptions Management" />
-            <Button onAction="#goToExpenseManagement" prefHeight="44.0" prefWidth="200.0" text="Expense Management" />
-            <Button onAction="#goToReports" prefHeight="44.0" prefWidth="200.0" styleClass="content-area" text="Reports" />
-            <Button onAction="#handleLogout" prefHeight="36.0" prefWidth="200.0" style="-fx-alignment: center;" styleClass="logout-button" text="Logout" />
-         </children>
-         <opaqueInsets>
-            <Insets bottom="38.0" />
-         </opaqueInsets>
-      </VBox>
-   </left>
-   <center>
-      <VBox alignment="CENTER" spacing="10" styleClass="content-area">
-         <Label styleClass="dashboard-welcome-label" text="Welcome to the Dashboard" />
-         <Label styleClass="dashboard-instruction-label" text="Select an option from the menu to get started." />
-      </VBox>
-   </center>
-   <bottom>
-      <HBox alignment="CENTER" spacing="10" styleClass="footer">
 
-      </HBox>
-   </bottom>
-</BorderPane>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="474.0" prefWidth="712.0" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.admin.Controller.DashboardController">
+   <children>
+      <BorderPane layoutY="-1.0" prefHeight="474.0" prefWidth="712.0" stylesheets="@Styles.css" AnchorPane.bottomAnchor="10.0" AnchorPane.topAnchor="10.0">
+         <top>
+            <HBox alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="800.0" spacing="10" style="-fx-alignment: center;" styleClass="header">
+               <children>
+                  <Label prefHeight="50.0" prefWidth="378.0" style="-fx-alignment: center; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 30; -fx-font-style: Italic;" styleClass="app-title" text="Sportiga">
+                     <font>
+                        <Font name="System Bold Italic" size="38.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+         </top>
+         <left>
+            <VBox prefHeight="500.0" prefWidth="232.0" spacing="20" style="-fx-alignment: center;" styleClass="nav-pane">
+               <children>
+                  <Button onAction="#goToMemberManagement" prefHeight="65.0" prefWidth="200.0" text="Member Management" />
+                  <Button onAction="#goToTeamManagement" prefHeight="65.0" prefWidth="200.0" text="Team Management" />
+                  <Button onAction="#goToSubscriptionsManagement" prefHeight="65.0" prefWidth="200.0" text="Subscriptions Management" />
+                  <Button onAction="#goToExpenseManagement" prefHeight="65.0" prefWidth="200.0" text="Expense Management" />
+                  <Button onAction="#goToReports" prefHeight="65.0" prefWidth="200.0" text="Reports" />
+                  <Button onAction="#handleLogout" prefHeight="65.0" prefWidth="206.0" style="-fx-alignment: center;" styleClass="logout-button" text="Logout" />
+               </children>
+            </VBox>
+         </left>
+         <center>
+            <VBox fx:id="contentArea" alignment="CENTER" spacing="20" styleClass="content-area">
+               <children>
+                  <HBox alignment="CENTER" spacing="20">
+                     <children>
+                        <VBox alignment="CENTER" spacing="10">
+                           <children>
+                              <Label prefHeight="20.0" prefWidth="182.0" style="-fx-alignment: center; -fx-text-fill: white; -fx-font-weight: bold;" text="Members Statistics" />
+                              <PieChart fx:id="membersChart" prefHeight="400.0" prefWidth="258.0" style="-fx-background-color: white;" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="10">
+                           <children>
+                              <Label prefHeight="40.0" prefWidth="163.0" style="-fx-font-weight: bold; -fx-text-fill: white; -fx-alignment: center;" styleClass="dashboard-welcome-label" text="Income This Month" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="33.0" />
+                                 </font>
+                              </Label>
+                              <BarChart fx:id="incomeChart" animated="true" prefHeight="414.0" prefWidth="327.0">
+                                 <xAxis>
+                                    <CategoryAxis fx:id="incomeXAxis" />
+                                 </xAxis>
+                                 <yAxis>
+                                    <NumberAxis fx:id="incomeYAxis" />
+                                 </yAxis>
+                              </BarChart>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>

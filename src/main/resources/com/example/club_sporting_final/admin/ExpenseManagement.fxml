@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.club_sporting_final.admin.Controller.ExpenseManagementController"
-            prefHeight="400.0" prefWidth="600.0">
-    <VBox spacing="10" alignment="CENTER" AnchorPane.topAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.admin.Controller.ExpenseManagementController">
+    <VBox alignment="CENTER" spacing="10" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
         <TableView fx:id="expenseTable" prefHeight="200.0" prefWidth="580.0">
             <columns>
-                <TableColumn fx:id="expenseIDColumn" text="Expense ID" prefWidth="100.0" />
-                <TableColumn fx:id="expenseTypeColumn" text="Expense Type" prefWidth="150.0" />
-                <TableColumn fx:id="amountColumn" text="Amount" prefWidth="100.0" />
-                <TableColumn fx:id="dateColumn" text="Date" prefWidth="130.0" />
-                <TableColumn fx:id="teamIDColumn" text="Team ID" prefWidth="100.0" />
+                <TableColumn fx:id="expenseIDColumn" prefWidth="100.0" text="Expense ID" />
+                <TableColumn fx:id="expenseTypeColumn" prefWidth="150.0" text="Expense Type" />
+                <TableColumn fx:id="amountColumn" prefWidth="100.0" text="Amount" />
+                <TableColumn fx:id="dateColumn" prefWidth="130.0" text="Date" />
+                <TableColumn fx:id="teamIDColumn" prefWidth="100.0" text="Team ID" />
             </columns>
         </TableView>
 
@@ -30,14 +34,28 @@
             <DatePicker fx:id="datePicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label text="Team ID:" GridPane.rowIndex="3" />
             <TextField fx:id="teamIDField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <columnConstraints>
+                <ColumnConstraints />
+                <ColumnConstraints />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+            </rowConstraints>
         </GridPane>
 
-        <HBox spacing="10" alignment="CENTER">
-            <Button fx:id="addButton" text="Add Expense" onAction="#handleAddExpense" />
-            <Button fx:id="editButton" text="Edit Expense" onAction="#handleEditExpense" />
-            <Button fx:id="deleteButton" text="Delete Expense" onAction="#handleDeleteExpense" />
-            <Button fx:id="clearButton" text="Clear Fields" onAction="#handleClearFields" />
+        <HBox alignment="CENTER" spacing="10">
+            <Button fx:id="addButton" onAction="#handleAddExpense" text="Add Expense" />
+            <Button fx:id="editButton" onAction="#handleEditExpense" text="Edit Expense" />
+            <Button fx:id="deleteButton" onAction="#handleDeleteExpense" text="Delete Expense" />
+            <Button fx:id="clearButton" onAction="#handleClearFields" text="Clear Fields" />
+        </HBox>
+
+        <!-- Back to Dashboard Button -->
+        <HBox alignment="CENTER" spacing="10">
+            <Button fx:id="backButton" onAction="#handleBackToDashboard" text="Back to Dashboard" />
         </HBox>
     </VBox>
 </AnchorPane>
-

@@ -4,20 +4,28 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20" styleClass="main-container" stylesheets="@../admin/Styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.login.Controller.LoginController">
-
-    <!-- Application Title -->
-    <Label prefHeight="57.0" prefWidth="280.0" style="-fx-alignment: center;" stylesheets="@../admin/Styles.css" text="Sporting Club Management" />
-
-    <!-- Login Form -->
-    <VBox alignment="CENTER" spacing="10" styleClass="form-container">
-        <TextField fx:id="usernameField" prefHeight="26.0" prefWidth="518.0" promptText="Username" styleClass="error-label"  />
-        <PasswordField fx:id="passwordField" promptText="Password" styleClass="error-label"  />
-        <Label fx:id="errorLabel" styleClass="error-label" text="Invalid username or password!" visible="false" />
-    </VBox>
-
-    <!-- Login Button -->
-    <Button onAction="#handleLogin" prefHeight="40.0" prefWidth="82.0" style="-fx-font-family: Arial;"  text="Login" />
-</VBox>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@../admin/Styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.login.Controller.LoginController">
+   <children>
+      <VBox alignment="CENTER" layoutX="38.0" prefHeight="400.0" prefWidth="523.0" spacing="20" styleClass="main-container" stylesheets="@../admin/Styles.css">
+         <children>
+            <Label prefHeight="119.0" prefWidth="293.0" style="-fx-alignment: center; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 30; -fx-font-style: Italic;" stylesheets="@../admin/Styles.css" text="Sportiga" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="39.0" />
+               </font>
+            </Label>
+            <VBox alignment="CENTER" prefHeight="114.0" prefWidth="586.0" spacing="10" styleClass="form-container">
+               <children>
+                  <TextField fx:id="usernameField" prefHeight="40.0" prefWidth="560.0" promptText="Username" styleClass="input-field" />
+                  <PasswordField fx:id="passwordField" prefHeight="40.0" prefWidth="400.0" promptText="Password" styleClass="input-field" />
+                  <Label fx:id="errorLabel" styleClass="error-label" text="Invalid username or password!" visible="false" />
+               </children>
+            </VBox>
+            <Button onAction="#handleLogin" prefHeight="40.0" prefWidth="100.0" styleClass="primary-button" text="Login" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AddTeamController {
@@ -30,10 +31,12 @@ public class AddTeamController {
     @FXML
     public void initialize() {
         // Initialize categories
-        ObservableList<String> categories = FXCollections.observableArrayList("Football", "Fitness", "Swimming");
+        ObservableList<String> categories = loadCategoriesFromDatabase();
         categoryComboBox.setItems(categories);
         categoryComboBox.setEditable(true); // Allow users to type a new category
-        categoryComboBox.setValue("Football"); // Default value
+        if (!categories.isEmpty()) {
+            categoryComboBox.setValue(categories.get(0)); // Default value to the first category
+        }
     }
 
     @FXML
@@ -53,6 +56,12 @@ public class AddTeamController {
         }
         if (category.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Validation Error", "Category cannot be empty.");
+            return;
+        }
+
+        // Validate if the team name already exists
+        if (isTeamNameDuplicate(teamName)) {
+            showAlert(Alert.AlertType.ERROR, "Duplicate Error", "Team name already exists. Please choose a different name.");
             return;
         }
 
@@ -90,6 +99,41 @@ public class AddTeamController {
         stage.close();
     }
 
+    private ObservableList<String> loadCategoriesFromDatabase() {
+        ObservableList<String> categories = FXCollections.observableArrayList();
+        String query = "SELECT DISTINCT Category FROM Teams";
+        try (Connection connection = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                categories.add(rs.getString("Category"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load categories: " + e.getMessage());
+        }
+        return categories;
+    }
+
+    private boolean isTeamNameDuplicate(String teamName) {
+        String query = "SELECT COUNT(*) FROM Teams WHERE TeamName = ?";
+        try (Connection connection = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            stmt.setString(1, teamName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Returns true if a duplicate exists
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not validate team name: " + e.getMessage());
+        }
+        return false;
+    }
 
     private void showAlert(Alert.AlertType alertType, String title, String content) {
         Alert alert = new Alert(alertType);
@@ -97,5 +141,9 @@ public class AddTeamController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    public boolean isTeamAdded() {
+        return teamAdded;
     }
 }

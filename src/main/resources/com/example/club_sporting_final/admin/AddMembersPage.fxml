@@ -1,68 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.club_sporting_final.admin.Controller.AddMemberController" spacing="10" alignment="TOP_CENTER" prefHeight="500.0" prefWidth="600.0">
-    <!-- Title -->
-    <Label text="Member Details" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
 
-    <!-- Input Fields -->
-    <GridPane hgap="10" vgap="10">
-        <!-- Name -->
-        <Label text="Name:" />
-        <TextField fx:id="nameField" promptText="Enter member's name" GridPane.columnIndex="1" />
-        <Label text="Name must not be empty." GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-text-fill: red;" visible="false" fx:id="nameErrorLabel" />
-
-        <!-- Email -->
-        <Label text="Email:" GridPane.rowIndex="1" />
-        <TextField fx:id="emailField" promptText="Enter email address" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <Label text="Invalid email format." GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-text-fill: red;" visible="false" fx:id="emailErrorLabel" />
-
-        <!-- Phone -->
-        <Label text="Phone Number:" GridPane.rowIndex="2" />
-        <TextField fx:id="phoneField" promptText="Enter phone number" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-        <Label text="Phone must be 10 digits." GridPane.columnIndex="2" GridPane.rowIndex="2" style="-fx-text-fill: red;" visible="false" fx:id="phoneErrorLabel" />
-
-        <!-- Subscription Status -->
-        <Label text="Subscription Active:" GridPane.rowIndex="3" />
-        <CheckBox fx:id="subscriptionStatus" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-
-        <!-- Team Choice -->
-        <Label text="Team:" GridPane.rowIndex="4" />
-        <ChoiceBox fx:id="teamChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-        <Label text="Please select a team." GridPane.columnIndex="2" GridPane.rowIndex="4" style="-fx-text-fill: red;" visible="false" fx:id="teamErrorLabel" />
-
-        <!-- Subscription Plan -->
-        <Label text="Subscription Plan:" GridPane.rowIndex="5" />
-        <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="5">
-            <RadioButton fx:id="monthlyPlan" text="Monthly" />
-            <RadioButton fx:id="quarterlyPlan" text="Quarterly" />
-            <RadioButton fx:id="yearlyPlan" text="Yearly" />
-        </HBox>
-        <Label text="Please select a plan." GridPane.columnIndex="2" GridPane.rowIndex="5" style="-fx-text-fill: red;" visible="false" fx:id="planErrorLabel" />
-    </GridPane>
-
-    <!-- Action Buttons -->
-    <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button fx:id="saveButton" text="Save" onAction="#handleSave">
-            <tooltip>
-                <Tooltip text="Save the member details." />
-            </tooltip>
-        </Button>
-        <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel">
-            <tooltip>
-                <Tooltip text="Cancel and close the form." />
-            </tooltip>
-        </Button>
-    </HBox>
-</VBox>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="408.0" prefWidth="630.0" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.admin.Controller.AddMemberController">
+   <children>
+      <VBox alignment="CENTER" layoutX="-1.0" layoutY="-6.0" prefHeight="410.0" prefWidth="600.0" spacing="10" stylesheets="@Styles.css" AnchorPane.leftAnchor="10.0">
+         <children>
+            <Label alignment="CENTER" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;" text="Member Details" />
+            <GridPane hgap="10" vgap="10">
+               <columnConstraints>
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
+               <children>
+                  <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Name:" />
+                  <TextField fx:id="nameField" promptText="Enter member's name" GridPane.columnIndex="1" />
+                  <Label fx:id="nameErrorLabel" style="-fx-text-fill: red;" text="Name must not be empty." visible="false" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                  <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Email:" GridPane.rowIndex="1" />
+                  <TextField fx:id="emailField" promptText="Enter email address" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label fx:id="emailErrorLabel" style="-fx-text-fill: red;" text="Invalid email format." visible="false" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Phone Number:" GridPane.rowIndex="2" />
+                  <TextField fx:id="phoneField" promptText="Enter phone number" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label fx:id="phoneErrorLabel" style="-fx-text-fill: red;" text="Phone must be 10 digits." visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Subscription Active:" GridPane.rowIndex="3" />
+                  <CheckBox fx:id="subscriptionStatus" styleClass="dialog-pane" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Team:" GridPane.rowIndex="4" />
+                  <ChoiceBox fx:id="teamChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Label fx:id="teamErrorLabel" style="-fx-text-fill: red;" text="Please select a team." visible="false" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                  <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Subscription Plan:" GridPane.rowIndex="5" />
+                  <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                     <children>
+                        <RadioButton fx:id="monthlyPlan" styleClass="choice-box" text="Monthly" />
+                        <RadioButton fx:id="quarterlyPlan" styleClass="choice-box" text="Quarterly" />
+                        <RadioButton fx:id="yearlyPlan" styleClass="choice-box" text="Yearly" />
+                     </children>
+                  </HBox>
+                  <Label fx:id="planErrorLabel" style="-fx-text-fill: red;" text="Please select a plan." visible="false" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+               </children>
+            </GridPane>
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+               <children>
+                  <Button fx:id="saveButton" onAction="#handleSave" text="Save">
+                     <tooltip>
+                        <Tooltip text="Save the member details." />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="cancelButton" onAction="#handleCancel" text="Cancel">
+                     <tooltip>
+                        <Tooltip text="Cancel and close the form." />
+                     </tooltip>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

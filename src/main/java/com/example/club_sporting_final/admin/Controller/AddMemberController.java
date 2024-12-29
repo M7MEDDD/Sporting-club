@@ -66,7 +66,14 @@ public class AddMemberController {
              PreparedStatement stmt = connection.prepareStatement("SELECT TeamID, TeamName FROM teams")) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                teamList.add(new Team(rs.getInt("TeamID"), rs.getString("TeamName"), null, null, 0));
+                teamList.add(new Team(
+                        rs.getInt("TeamID"),
+                        rs.getString("TeamName"),
+                        rs.getString("CoachName"),
+                        rs.getString("Category"),
+                        rs.getInt("MemberCount"),
+                        rs.getInt("TeamLeaderID")
+                ));
             }
             teamChoiceBox.setItems(teamList);
         } catch (SQLException e) {

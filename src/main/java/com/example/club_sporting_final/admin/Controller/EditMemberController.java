@@ -76,13 +76,25 @@ public class EditMemberController {
      * Loads teams into the ChoiceBox.
      */
     private void loadTeams() {
+        String query = "SELECT TeamID, TeamName FROM teams";
+
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement("SELECT TeamID, TeamName FROM teams")) {
-            ResultSet rs = stmt.executeQuery();
+             PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                teamList.add(new Team(rs.getInt("TeamID"), rs.getString("TeamName"), null, null, rs.getInt("MemberCount")));
+                teamList.add(new Team(
+                        rs.getInt("TeamID"),
+                        rs.getString("TeamName"),
+                        rs.getString("CoachName"),
+                        rs.getString("Category"),
+                        rs.getInt("MemberCount"),
+                        rs.getInt("TeamLeaderID")
+                ));
             }
+
             teamChoiceBox.setItems(teamList);
+
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load teams: " + e.getMessage());

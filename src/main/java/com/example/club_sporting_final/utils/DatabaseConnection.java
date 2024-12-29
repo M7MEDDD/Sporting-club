@@ -10,9 +10,9 @@ public class DatabaseConnection {
     private static DatabaseConnection instance;
 
     // Database credentials
-    private final String URL = "jdbc:mysql://localhost:3306/sportingclub"; // Update the URL if needed
-    private final String USER = "root"; // Update with your username
-    private final String PASSWORD = ""; // Update with your password
+    private static final String URL = "jdbc:mysql://localhost:3306/sportingclub"; // Update the URL if needed
+    private static final String USER = "root"; // Update with your username
+    private static final String PASSWORD = ""; // Update with your password
 
     // Connection object
     private Connection connection;
@@ -22,7 +22,7 @@ public class DatabaseConnection {
         try {
             System.out.println("Initializing database connection...");
             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            connection.setAutoCommit(true); // Ensure auto-commit is enabled
+            connection.setAutoCommit(true); // Enable auto-commit for transactions
             System.out.println("Database connection established successfully.");
         } catch (SQLException e) {
             System.err.println("Error connecting to the database: " + e.getMessage());
@@ -67,7 +67,12 @@ public class DatabaseConnection {
         try {
             DatabaseConnection dbConnection = DatabaseConnection.getInstance();
             Connection connection = dbConnection.getConnection();
-            System.out.println("Database connection test passed.");
+            if (connection != null && !connection.isClosed()) {
+                System.out.println("Database connection test passed.");
+                dbConnection.closeConnection();
+            } else {
+                System.err.println("Database connection test failed: Connection is null or closed.");
+            }
         } catch (SQLException e) {
             System.err.println("Database connection test failed: " + e.getMessage());
             e.printStackTrace();

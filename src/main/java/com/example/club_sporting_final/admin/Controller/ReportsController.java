@@ -6,9 +6,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -72,6 +76,19 @@ public class ReportsController {
         // Load initial data
         loadReportsData();
         calculateSummary();
+    }
+    @FXML
+    private void goBackToDashboard(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/club_sporting_final/admin/Dashboard.fxml"));
+            Scene scene = new Scene(loader.load());
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.setScene(scene);
+            currentStage.setTitle("Dashboard");
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not load the Dashboard: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void loadReportsData() {

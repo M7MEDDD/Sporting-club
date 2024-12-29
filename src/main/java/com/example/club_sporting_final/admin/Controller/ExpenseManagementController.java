@@ -9,9 +9,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -60,10 +64,30 @@ public class ExpenseManagementController {
         dateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDate()));
         teamIDColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getTeamID()).asObject());
 
-
         // Load expenses into the table
         loadExpenses();
+
+        // Add listener for table row selection
+        expenseTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                populateFields(newSelection);
+            }
+        });
     }
+    @FXML
+    private void handleBackToDashboard(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/club_sporting_final/admin/DashBoard.fxml"));
+            Scene dashboardScene = new Scene(loader.load());
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.setScene(dashboardScene);
+            currentStage.setTitle("Dashboard");
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Failed to load the dashboard.");
+        }
+    }
+
 
     private void loadExpenses() {
         expenseList.clear();
@@ -90,12 +114,23 @@ public class ExpenseManagementController {
         }
     }
 
+    private void populateFields(Expense expense) {
+        expenseTypeField.setText(expense.getExpenseType());
+        amountField.setText(String.valueOf(expense.getAmount()));
+        teamIDField.setText(String.valueOf(expense.getTeamID()));
+        if (expense.getDate() != null && !expense.getDate().isEmpty()) {
+            datePicker.setValue(java.time.LocalDate.parse(expense.getDate()));
+        } else {
+            datePicker.setValue(null);
+        }
+    }
+
     @FXML
     private void handleAddExpense(ActionEvent event) {
         String expenseType = expenseTypeField.getText().trim();
         String date = datePicker.getValue() != null ? datePicker.getValue().toString() : "";
-        int teamID;
         double amount;
+        int teamID;
 
         try {
             amount = Double.parseDouble(amountField.getText().trim());
@@ -105,13 +140,18 @@ public class ExpenseManagementController {
             return;
         }
 
+        // Validate TeamID
+        if (!isValidTeamID(teamID)) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Invalid Team ID. Please select a valid team.");
+            return;
+        }
+
         if (expenseType.isEmpty() || date.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill in all fields.");
             return;
         }
 
         String query = "INSERT INTO expenses (ExpenseType, Amount, Date, TeamID) VALUES (?, ?, ?, ?)";
-
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
@@ -153,13 +193,18 @@ public class ExpenseManagementController {
             return;
         }
 
+        // Validate TeamID
+        if (!isValidTeamID(teamID)) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Invalid Team ID. Please select a valid team.");
+            return;
+        }
+
         if (expenseType.isEmpty() || date.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill in all fields.");
             return;
         }
 
         String query = "UPDATE expenses SET ExpenseType = ?, Amount = ?, Date = ?, TeamID = ? WHERE ExpenseID = ?";
-
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
@@ -222,5 +267,21 @@ public class ExpenseManagementController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private boolean isValidTeamID(int teamID) {
+        String query = "SELECT COUNT(*) FROM teams WHERE TeamID = ?";
+        try (Connection connection = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, teamID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Return true if TeamID exists
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not validate Team ID: " + e.getMessage());
+        }
+        return false;
     }
 }
