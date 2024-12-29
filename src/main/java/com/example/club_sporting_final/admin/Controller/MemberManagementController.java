@@ -5,8 +5,10 @@ import com.example.club_sporting_final.utils.DatabaseConnection;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -45,7 +47,7 @@ public class MemberManagementController {
     private TableColumn<Members, String> statusColumn;
 
     @FXML
-    private Button addButton, editButton, deleteButton, backButton;
+    private Button addButton, editButton, deleteButton;
 
     private ObservableList<Members> memberList = FXCollections.observableArrayList();
 
@@ -63,7 +65,7 @@ public class MemberManagementController {
         addButton.setOnAction(e -> openAddMemberForm());
         editButton.setOnAction(e -> openEditMemberForm());
         deleteButton.setOnAction(e -> deleteMember());
-        backButton.setOnAction(e -> returnToDashboard());
+
         btSearch.setOnAction(e -> searchMembers());
     }
 
@@ -196,8 +198,17 @@ public class MemberManagementController {
     }
 
     @FXML
-    private void returnToDashboard() {
-        openForm("/com/example/club_sporting_final/admin/DashBoard.fxml", "Dashboard");
+    private void returnToDashboard(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/club_sporting_final/admin/DashBoard.fxml"));
+            Scene dashboardScene = new Scene(loader.load());
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.setScene(dashboardScene);
+            currentStage.setTitle("Dashboard");
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Failed to load the dashboard.");
+        }
     }
 
     private void openForm(String fxmlPath, String title) {

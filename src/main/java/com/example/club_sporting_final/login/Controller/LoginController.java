@@ -74,7 +74,6 @@ public class LoginController {
 
     private void loadAdminDashboard() {
         try {
-            System.out.println(getClass().getResource("/com/example/club_sporting_final/admin/DashBoard.fxml"));
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/club_sporting_final/admin/DashBoard.fxml"));
             Scene scene = new Scene(loader.load());
             Stage stage = (Stage) usernameField.getScene().getWindow();

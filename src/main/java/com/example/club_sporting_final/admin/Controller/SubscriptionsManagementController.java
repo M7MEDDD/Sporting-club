@@ -4,10 +4,9 @@ import com.example.club_sporting_final.admin.module.Subscription;
 import com.example.club_sporting_final.utils.DatabaseConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -54,6 +53,7 @@ public class SubscriptionsManagementController {
 
     @FXML
     public void initialize() {
+        // Bind columns to Subscription model properties
         idColumn.setCellValueFactory(data -> data.getValue().subscriptionIDProperty().asObject());
         memberColumn.setCellValueFactory(data -> data.getValue().memberIDProperty().asObject());
         planColumn.setCellValueFactory(data -> data.getValue().planTypeProperty());
@@ -61,11 +61,41 @@ public class SubscriptionsManagementController {
         endDateColumn.setCellValueFactory(data -> data.getValue().endDateProperty());
         amountColumn.setCellValueFactory(data -> data.getValue().amountProperty().asObject());
 
-        loadSubscriptions();
+        // Apply a custom row factory to change row color based on condition
+        subscriptionTable.setRowFactory(tv -> new TableRow<>() {
+            @Override
+            protected void updateItem(Subscription subscription, boolean empty) {
+                super.updateItem(subscription, empty);
 
-        // Add functionality to the Inactive button
-        inactiveButton.setOnAction(e -> showInactiveSubscriptions());
+                if (subscription == null || empty) {
+                    setStyle(""); // Reset style for empty rows
+                } else {
+                    LocalDate endDate = LocalDate.parse(subscription.getEndDate());
+                    if (endDate.isBefore(LocalDate.now())) {
+                        setStyle("-fx-background-color: #ffcccc;"); // Light red background
+                    } else {
+                        setStyle(""); // Default style for other rows
+                    }
+                }
+            }
+        });
+
+        // Load data into the TableView
+        loadSubscriptions();
     }
+    @FXML
+    private void returnToDashboard() {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/com/example/club_sporting_final/admin/Dashboard.fxml"));
+            Stage stage = (Stage) searchField.getScene().getWindow(); // Use a component to get the current stage
+            stage.setScene(new Scene(root));
+            stage.setTitle("Dashboard");
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not return to Dashboard.");
+        }
+    }
+
 
     private void loadSubscriptions() {
         subscriptions.clear();
@@ -76,33 +106,21 @@ public class SubscriptionsManagementController {
 
             while (rs.next()) {
                 subscriptions.add(new Subscription(
-                        rs.getInt("SubscriptionID"),
-                        rs.getInt("MemberID"),
-                        rs.getString("PlanType"),
-                        rs.getString("StartDate"),
-                        rs.getString("EndDate"),
-                        rs.getDouble("Amount")
+                        rs.getInt("SubscriptionID"),  // Ensure this matches your database column name
+                        rs.getInt("MemberID"),       // Ensure this matches your database column name
+                        rs.getString("PlanType"),    // Ensure this matches your database column name
+                        rs.getString("StartDate"),   // Ensure this matches your database column name
+                        rs.getString("EndDate"),     // Ensure this matches your database column name
+                        rs.getDouble("Amount")       // Ensure this matches your database column name
                 ));
             }
+
+
         } catch (SQLException e) {
             showError("Database Error", "Could not load subscriptions: " + e.getMessage());
         }
         subscriptionTable.setItems(subscriptions);
     }
-    @FXML
-    private void handleBackToDashboard(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/club_sporting_final/admin/DashBoard.fxml"));
-            Scene dashboardScene = new Scene(loader.load());
-            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            currentStage.setScene(dashboardScene);
-            currentStage.setTitle("Dashboard");
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Failed to load the dashboard.");
-        }
-    }
-
 
 
     @FXML

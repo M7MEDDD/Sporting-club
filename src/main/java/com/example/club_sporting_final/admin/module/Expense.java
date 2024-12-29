@@ -7,16 +7,15 @@ public class Expense {
     private final StringProperty expenseType;
     private final DoubleProperty amount;
     private final StringProperty date;
-    private final IntegerProperty teamID;
 
-    public Expense(int expenseID, String expenseType, double amount, String date, int teamID) {
+    public Expense(int expenseID, String expenseType, double amount, String date) {
         this.expenseID = new SimpleIntegerProperty(expenseID);
         this.expenseType = new SimpleStringProperty(expenseType);
         this.amount = new SimpleDoubleProperty(amount);
         this.date = new SimpleStringProperty(date);
-        this.teamID = new SimpleIntegerProperty(teamID);
     }
 
+    // Getters
     public int getExpenseID() {
         return expenseID.get();
     }
@@ -49,11 +48,16 @@ public class Expense {
         return date;
     }
 
-    public int getTeamID() {
-        return teamID.get();
+    // Setters
+    public void setExpenseType(String expenseType) {
+        this.expenseType.set(expenseType);
     }
 
-    public IntegerProperty teamIDProperty() {
-        return teamID;
+    public void setAmount(double amount) {
+        this.amount.set(amount);
+    }
+
+    public void setDate(String date) {
+        this.date.set(date);
     }
 }

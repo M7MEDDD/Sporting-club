@@ -9,10 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class EditTeamController {
 
@@ -43,39 +40,72 @@ public class EditTeamController {
         categoryComboBox.setItems(categories);
     }
 
+    /**
+     * Sets the team to be edited.
+     *
+     * @param team the team object to edit
+     */
     public void setTeam(Team team) {
         this.team = team;
 
         // Populate fields with the selected team's data
         teamNameField.setText(team.getTeamName());
-        teamLeaderIDField.setText(String.valueOf(team.getTeamLeaderID())); // Assuming TeamLeaderID is an integer
+        teamLeaderIDField.setText(String.valueOf(team.getTeamID())); // Assuming TeamLeaderID is an integer
         coachNameField.setText(team.getCoachName());
         categoryComboBox.setValue(team.getCategory());
     }
 
+    /**
+     * Handles the save action to update the team's details in the database.
+     *
+     * @param event the ActionEvent
+     */
     @FXML
     void handleSave(ActionEvent event) {
         String teamName = teamNameField.getText().trim();
-        String teamLeaderID = teamLeaderIDField.getText().trim();
         String coachName = coachNameField.getText().trim();
         String category = categoryComboBox.getValue();
 
-        if (teamName.isEmpty() || teamLeaderID.isEmpty() || coachName.isEmpty() || category == null) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill in all fields.");
+        // Validate fields
+        if (teamName.isEmpty() || coachName.isEmpty() || category == null) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill in all required fields.");
             return;
         }
 
-        // Validate TeamLeaderID
-        if (!isNumeric(teamLeaderID) || !isValidMemberID(Integer.parseInt(teamLeaderID))) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Invalid Team Leader ID. Please provide a valid Member ID.");
-            return;
+        Integer teamLeaderID = null;
+        if (!teamLeaderIDField.getText().trim().isEmpty()) {
+            try {
+                teamLeaderID = Integer.parseInt(teamLeaderIDField.getText().trim());
+            } catch (NumberFormatException e) {
+                showAlert(Alert.AlertType.ERROR, "Validation Error", "Team Leader ID must be a valid integer.");
+                return;
+            }
         }
 
+        // Database operations
         try (Connection connection = DatabaseConnection.getInstance().getConnection()) {
+            // Check if TeamLeaderID exists in members table
+            if (teamLeaderID != null) {
+                String checkQuery = "SELECT COUNT(*) FROM members WHERE MemberID = ?";
+                try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+                    checkStmt.setInt(1, teamLeaderID);
+                    ResultSet rs = checkStmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) == 0) {
+                        showAlert(Alert.AlertType.ERROR, "Validation Error", "The specified Team Leader ID does not exist.");
+                        return;
+                    }
+                }
+            }
+
+            // Update team details
             String updateQuery = "UPDATE teams SET TeamName = ?, TeamLeaderID = ?, CoachName = ?, Category = ? WHERE TeamID = ?";
             try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
                 stmt.setString(1, teamName);
-                stmt.setInt(2, Integer.parseInt(teamLeaderID));
+                if (teamLeaderID != null) {
+                    stmt.setInt(2, teamLeaderID);
+                } else {
+                    stmt.setNull(2, java.sql.Types.INTEGER);
+                }
                 stmt.setString(3, coachName);
                 stmt.setString(4, category);
                 stmt.setInt(5, team.getTeamID());
@@ -88,40 +118,19 @@ public class EditTeamController {
                     showAlert(Alert.AlertType.ERROR, "Error", "Failed to update team.");
                 }
             }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Foreign key constraint violation: Make sure the Team Leader ID exists.");
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Database Error", "An error occurred while updating the team: " + e.getMessage());
         }
     }
 
-    private boolean isValidMemberID(int memberID) {
-        String query = "SELECT COUNT(*) FROM members WHERE MemberID = ?";
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, memberID);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0; // Return true if MemberID exists
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not validate Member ID: " + e.getMessage());
-        }
-        return false;
-    }
-
-    private boolean isNumeric(String str) {
-        if (str == null || str.isEmpty()) {
-            return false;
-        }
-        try {
-            Integer.parseInt(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
+    /**
+     * Handles the cancel action to close the edit team window.
+     *
+     * @param event the ActionEvent
+     */
     @FXML
     void handleCancel(ActionEvent event) {
         closeWindow();

@@ -10,15 +10,13 @@ public class DatabaseConnection {
     private static DatabaseConnection instance;
 
     // Database credentials
-<<<<<<< HEAD
+//<<<<<<< HEAD
     private static final String URL = "jdbc:mysql://localhost:3306/sportingclub"; // Update the URL if needed
     private static final String USER = "root"; // Update with your username
     private static final String PASSWORD = ""; // Update with your password
-=======
-    private final String URL = "jdbc:mysql://localhost:3306/sportingclub";
-    private final String USER = "root";
-    private final String PASSWORD = "";
->>>>>>> be5da411db56b315be0e1d8e010d71902cce5756
+//=======
+
+//>>>>>>> be5da411db56b315be0e1d8e010d71902cce5756
 
     // Connection object
     private Connection connection;
@@ -28,11 +26,11 @@ public class DatabaseConnection {
         try {
             System.out.println("Initializing database connection...");
             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-<<<<<<< HEAD
+//<<<<<<< HEAD
             connection.setAutoCommit(true); // Enable auto-commit for transactions
-=======
+//=======
             connection.setAutoCommit(true);
->>>>>>> be5da411db56b315be0e1d8e010d71902cce5756
+//>>>>>>> be5da411db56b315be0e1d8e010d71902cce5756
             System.out.println("Database connection established successfully.");
         } catch (SQLException e) {
             System.err.println("Error connecting to the database: " + e.getMessage());
