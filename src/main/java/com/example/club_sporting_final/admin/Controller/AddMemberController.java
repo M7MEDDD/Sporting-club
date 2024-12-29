@@ -16,10 +16,10 @@ import java.sql.SQLException;
 public class AddMemberController {
 
     @FXML
-    private TextField emailField;
+    private TextField nameField;
 
     @FXML
-    private TextField nameField;
+    private TextField emailField;
 
     @FXML
     private TextField phoneField;
@@ -51,13 +51,13 @@ public class AddMemberController {
 
     @FXML
     public void initialize() {
-        // Initialize toggle group
+        // Initialize toggle group for subscription plans
         planToggleGroup = new ToggleGroup();
         monthlyPlan.setToggleGroup(planToggleGroup);
         quarterlyPlan.setToggleGroup(planToggleGroup);
         yearlyPlan.setToggleGroup(planToggleGroup);
 
-        // Load teams
+        // Load teams from the database into the choice box
         loadTeams();
     }
 
@@ -66,9 +66,9 @@ public class AddMemberController {
              PreparedStatement stmt = connection.prepareStatement("SELECT TeamID, TeamName FROM teams")) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                teamList.add(new Team(rs.getInt("TeamID"), rs.getString("TeamName"), null, null, rs.getInt("MemberCount")));
+                teamList.add(new Team(rs.getInt("TeamID"), rs.getString("TeamName"), null, null, 0));
             }
-            teamChoiceBox.setItems(FXCollections.observableArrayList(teamList));
+            teamChoiceBox.setItems(teamList);
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load teams: " + e.getMessage());
         }
@@ -76,16 +76,16 @@ public class AddMemberController {
 
     @FXML
     private void handleSave() {
-        String memberName = nameField.getText().trim();
+        String name = nameField.getText().trim();
         String email = emailField.getText().trim();
         String phone = phoneField.getText().trim();
         Team selectedTeam = teamChoiceBox.getValue();
         boolean isSubscribed = subscriptionStatus.isSelected();
         String planType = getSelectedPlanType();
 
-        if (!validateInputs(memberName, email, phone, selectedTeam, planType)) return;
+        if (!validateInputs(name, email, phone, selectedTeam, planType)) return;
 
-        String insertMemberQuery = "INSERT INTO members (Name, Email, PhoneNumber) VALUES (?, ?, ?)";
+        String insertMemberQuery = "INSERT INTO members (Name, Email, PhoneNumber, SubscriptionStatus) VALUES (?, ?, ?, ?)";
         String associateTeamQuery = "INSERT INTO team_members (MemberID, TeamID) VALUES (?, ?)";
         String insertSubscriptionQuery = "INSERT INTO subscriptions (MemberID, PlanType, StartDate, EndDate, Amount) VALUES (?, ?, ?, ?, ?)";
 
@@ -93,30 +93,32 @@ public class AddMemberController {
             connection.setAutoCommit(false);
 
             int memberID;
-
-            // Step 1: Insert member
+            // Insert member into the database
             try (PreparedStatement memberStmt = connection.prepareStatement(insertMemberQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                memberStmt.setString(1, memberName);
+                memberStmt.setString(1, name);
                 memberStmt.setString(2, email);
                 memberStmt.setString(3, phone);
+                memberStmt.setBoolean(4, isSubscribed);
                 memberStmt.executeUpdate();
 
-                ResultSet generatedKeys = memberStmt.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    memberID = generatedKeys.getInt(1);
+                ResultSet rs = memberStmt.getGeneratedKeys();
+                if (rs.next()) {
+                    memberID = rs.getInt(1);
                 } else {
-                    throw new SQLException("Failed to retrieve MemberID.");
+                    throw new SQLException("Failed to retrieve Member ID.");
                 }
             }
 
-            // Step 2: Associate with team
-            try (PreparedStatement teamStmt = connection.prepareStatement(associateTeamQuery)) {
-                teamStmt.setInt(1, memberID);
-                teamStmt.setInt(2, selectedTeam.getTeamID());
-                teamStmt.executeUpdate();
+            // Associate member with a team
+            if (selectedTeam != null) {
+                try (PreparedStatement teamStmt = connection.prepareStatement(associateTeamQuery)) {
+                    teamStmt.setInt(1, memberID);
+                    teamStmt.setInt(2, selectedTeam.getTeamID());
+                    teamStmt.executeUpdate();
+                }
             }
 
-            // Step 3: Insert subscription
+            // Add subscription details if subscribed
             if (isSubscribed) {
                 String startDate = java.time.LocalDate.now().toString();
                 String endDate = calculateEndDate(startDate, planType);
@@ -133,24 +135,24 @@ public class AddMemberController {
             }
 
             connection.commit();
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Member and subscription added successfully.");
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Member added successfully!");
             closeWindow();
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "An error occurred: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
     }
 
     private boolean validateInputs(String name, String email, String phone, Team team, String planType) {
-        if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || team == null || planType == null) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "All fields must be filled.");
+        if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || team == null) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "All fields are required.");
             return false;
         }
-        if (!email.matches("^\\S+@\\S+\\.\\S+$")) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Enter a valid email address.");
+        if (!email.matches("\\S+@\\S+\\.\\S+")) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Invalid email format.");
             return false;
         }
         if (!phone.matches("\\d{10}")) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Enter a valid 10-digit phone number.");
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Phone number must be 10 digits.");
             return false;
         }
         return true;
@@ -167,7 +169,7 @@ public class AddMemberController {
             case "monthly" -> start.plusMonths(1).toString();
             case "quarterly" -> start.plusMonths(3).toString();
             case "yearly" -> start.plusYears(1).toString();
-            default -> throw new IllegalArgumentException("Invalid plan type: " + planType);
+            default -> start.toString();
         };
     }
 
@@ -176,13 +178,15 @@ public class AddMemberController {
             case "monthly" -> 50.0;
             case "quarterly" -> 150.0;
             case "yearly" -> 500.0;
-            default -> throw new IllegalArgumentException("Invalid plan type: " + planType);
+            default -> 0.0;
         };
     }
 
-    @FXML
-    private void handleCancel() {
-        closeWindow();
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private void closeWindow() {
@@ -190,11 +194,8 @@ public class AddMemberController {
         stage.close();
     }
 
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    @FXML
+    private void handleCancel() {
+        closeWindow();
     }
 }

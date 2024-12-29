@@ -1,43 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.club_sporting_final.admin.Controller.SubscriptionsManagementController"
-      spacing="10" alignment="TOP_CENTER" prefHeight="600.0" prefWidth="800.0">
+<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="800.0" spacing="10" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.club_sporting_final.admin.Controller.SubscriptionsManagementController">
 
     <!-- Page Header -->
-    <Label text="Subscriptions Management" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+    <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Subscriptions Management" />
 
     <!-- Search Section -->
-    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+    <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10;">
         <TextField fx:id="searchField" promptText="Search by Member Name or Plan" />
-        <Button fx:id="searchButton" text="Search" onAction="#searchSubscriptions" />
+        <Button fx:id="searchButton" onAction="#searchSubscriptions" text="Search" />
     </HBox>
 
     <!-- Table Section -->
     <TableView fx:id="subscriptionTable" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="idColumn" text="ID" prefWidth="50" />
-            <TableColumn fx:id="memberColumn" text="Member ID" prefWidth="100" />
-            <TableColumn fx:id="planColumn" text="Plan" prefWidth="100" />
-            <TableColumn fx:id="startDateColumn" text="Start Date" prefWidth="100" />
-            <TableColumn fx:id="endDateColumn" text="End Date" prefWidth="100" />
-            <TableColumn fx:id="amountColumn" text="Amount" prefWidth="100" />
+            <TableColumn fx:id="idColumn" prefWidth="50" style="-fx-text-fill: white: ;" />
+            <TableColumn fx:id="memberColumn" prefWidth="100" style="-fx-text-fill: white: ;" />
+            <TableColumn fx:id="planColumn" prefWidth="100" style="-fx-text-fill: white: ;" />
+            <TableColumn fx:id="startDateColumn" prefWidth="100" style="-fx-text-fill: white: ;" />
+            <TableColumn fx:id="endDateColumn" prefWidth="100" style="-fx-text-fill: white: ;" />
+            <TableColumn fx:id="amountColumn" prefWidth="100" style="-fx-text-fill: white: ;" />
         </columns>
     </TableView>
 
     <!-- Action Buttons -->
-    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10;">
+    <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding: 10;">
 <!--        <Button fx:id="addButton" text="Add Subscription" onAction="#addSubscription" />-->
-        <Button fx:id="editButton" text="Manage" onAction="#editSubscription" />
-        <Button fx:id="deleteButton" text="Delete" onAction="#deleteSubscription" />
-        <Button fx:id="inactiveButton" text="Show Inactive" onAction="#showInactiveSubscriptions" />
+        <Button fx:id="editButton" onAction="#editSubscription" stylesheets="@Styles.css" text="Manage" />
+        <Button fx:id="deleteButton" onAction="#deleteSubscription" text="Delete" />
+        <Button fx:id="inactiveButton" onAction="#showInactiveSubscriptions" text="Show Inactive" />
     </HBox>
 
 </VBox>

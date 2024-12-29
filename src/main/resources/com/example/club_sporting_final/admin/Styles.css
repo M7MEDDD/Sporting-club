@@ -1,89 +1,190 @@
-/* General Styles */
-
-.main-container {
-    -fx-padding: 20;
-    -fx-background-color: #f4f4f9;
+/* Root Style - General Background */
+.root {
+    -fx-background-color: #2b2b2b; /* Dark grey background for the application */
 }
 
-.header {
-    -fx-background-color: #2a9d8f;
-    -fx-padding: 10;
-}
-
-.nav-pane {
-    -fx-background-color: #264653;
-    -fx-padding: 15;
-    -fx-spacing: 15;
-}
-
-.footer {
-    -fx-background-color: #e9c46a;
-    -fx-padding: 10;
-    -fx-spacing: 10;
-}
-
-.content-area {
-    -fx-padding: 20;
-    -fx-spacing: 15;
-}
-
-/* Button Styles */
-
-.button {
-    -fx-background-color: #2a9d8f;
-    -fx-text-fill: #ffffff;
-    -fx-padding: 10;
+/* Labels */
+.label {
+    -fx-text-fill: #000000; /* Light grey text */
     -fx-font-size: 14px;
-    -fx-cursor: hand;
-    -fx-border-color: #264653;
-    -fx-border-width: 2;
+}
+
+.label.header {
+    -fx-font-size: 24px; /* Larger text for headers */
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffa726; /* Highlighted orange for headers */
+    -fx-alignment: center;
+}
+
+/* TextFields and ComboBoxes */
+.text-field, .combo-box, .choice-box {
+    -fx-background-color: #3c3f41; /* Slightly lighter dark background */
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-border-color: #555555; /* Subtle border for input fields */
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8;
+}
+
+.text-field:focused, .combo-box:focused, .choice-box:focused {
+    -fx-border-color: #ffa726; /* Highlighted orange border on focus */
+}
+
+.text-field:hover, .combo-box:hover, .choice-box:hover {
+    -fx-border-color: #607d8b; /* Lighter grey border on hover */
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #607d8b; /* Cool grey */
+    -fx-text-fill: white;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 16;
+    -fx-font-size: 14px;
 }
 
 .button:hover {
-    -fx-background-color: #21867a;
+    -fx-background-color: #ffa726; /* Highlight in orange on hover */
+    -fx-text-fill: #000000; /* Black text for contrast */
 }
 
-.logout-button {
-    -fx-background-color: #e76f51;
-    -fx-text-fill: white;
+.button:pressed {
+    -fx-background-color: #ff7043; /* Slightly darker orange when pressed */
 }
 
-.logout-button:hover {
-    -fx-background-color: #d65a3e;
+/* Checkboxes and Radio Buttons */
+.check-box, .radio-button {
+    -fx-text-fill: #e0e0e0; /* Light text for readability */
 }
 
-.navigation-button {
-    -fx-background-color: #457b9d;
-    -fx-text-fill: white;
-    -fx-font-size: 12px;
-    -fx-border-color: #1d3557;
+.check-box:focused, .radio-button:focused {
+    -fx-border-color: #ffa726; /* Highlight in orange when focused */
 }
 
-.navigation-button:hover {
-    -fx-background-color: #1d3557;
+/* Tables */
+.table-view {
+    -fx-background-color: #3c3f41; /* Matches input fields for consistency */
+    -fx-border-color: #555555;
+    -fx-border-radius: 8;
+    -fx-padding: 10;
+    -fx-text-fill: #ffffff; /* Default text color for table */
 }
 
-/* Text Styles */
-
-.app-title {
-    -fx-font-size: 18px;
+.table-column-header {
+    -fx-background-color: #2b2b2b; /* Darker header background */
+    -fx-text-fill: #ffffff; /* Light header text */
     -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: #3c3f41; /* Default row background */
+    -fx-text-fill: #ffffff; /* Ensure white text for table rows */
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #323437; /* Slightly darker background for alternating rows */
+    -fx-text-fill: #ffffff; /* Ensure text remains white */
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #ffa726; /* Highlight selected row in orange */
+    -fx-text-fill: #000000; /* Black text for contrast */
+}
+
+.table-cell {
+    -fx-text-fill: #ffffff; /* Ensure all cell text is white */
+}
+
+/* Scrollbars */
+.scroll-bar {
+    -fx-background-color: #2b2b2b;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #607d8b;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #ffa726; /* Highlight scrollbar on hover */
+}
+
+/* Tooltip */
+.tooltip {
+    -fx-background-color: #3c3f41;
     -fx-text-fill: #ffffff;
+    -fx-border-color: #555555;
 }
 
-.dashboard-welcome-label {
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #264653;
+/* Dialogs and Alerts */
+.dialog-pane {
+    -fx-background-color: #2b2b2b; /* Dark background for dialogs */
+    -fx-border-color: #555555;
+    -fx-header-color: #ffa726; /* Highlighted headers */
 }
 
-.dashboard-instruction-label {
-    -fx-font-size: 14px;
-    -fx-text-fill: #264653;
+.dialog-pane .header-panel {
+    -fx-background-color: #3c3f41;
+    -fx-text-fill: #e0e0e0;
 }
 
-.error-label {
-    -fx-text-fill: red;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
+.dialog-pane .content {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: #e0e0e0;
+}
+
+.dialog-pane .button-bar .button {
+    -fx-background-color: #607d8b;
+    -fx-text-fill: white;
+}
+
+.dialog-pane .button-bar .button:hover {
+    -fx-background-color: #ffa726;
+}
+
+/* TabPane */
+.tab-pane {
+    -fx-background-color: #2b2b2b; /* Background for tab pane */
+    -fx-border-color: #555555;
+}
+
+.tab-pane .tab-header-background {
+    -fx-background-color: #3c3f41; /* Darker tab background */
+}
+
+.tab-pane .tab {
+    -fx-background-color: #3c3f41;
+    -fx-text-fill: #e0e0e0;
+}
+
+.tab-pane .tab:hover {
+    -fx-background-color: #607d8b; /* Grey hover effect */
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #ffa726; /* Orange selected tab */
+    -fx-text-fill: #000000; /* Black text for contrast */
+}
+
+/* MenuBar */
+.menu-bar {
+    -fx-background-color: #3c3f41;
+    -fx-border-color: #555555;
+}
+
+.menu-bar .menu {
+    -fx-text-fill: #e0e0e0; /* Light menu text */
+}
+
+.menu-bar .menu:hover {
+    -fx-background-color: #607d8b;
+}
+
+/* ProgressBar */
+.progress-bar {
+    -fx-accent: #ffa726; /* Orange progress color */
+    -fx-background-color: #3c3f41;
+    -fx-border-color: #555555;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
 }
