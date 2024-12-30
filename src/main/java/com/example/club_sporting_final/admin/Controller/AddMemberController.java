@@ -1,6 +1,5 @@
 package com.example.club_sporting_final.admin.Controller;
 
-import com.example.club_sporting_final.admin.module.Members;
 import com.example.club_sporting_final.admin.module.Team;
 import com.example.club_sporting_final.utils.DatabaseConnection;
 import com.example.club_sporting_final.utils.EmailSender;
@@ -66,10 +65,17 @@ public class AddMemberController {
 
     private void loadTeams() {
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement("SELECT TeamID, TeamName FROM teams")) {
+             PreparedStatement stmt = connection.prepareStatement("SELECT TeamID, TeamName, TeamLeaderID, CoachName, Category FROM teams")) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                teamList.add(new Team(rs.getInt("TeamID"), rs.getString("TeamName"), null, null, 0));
+                teamList.add(new Team(
+                        rs.getInt("TeamID"),
+                        rs.getString("TeamName"),
+                        rs.getString("CoachName"),
+                        rs.getString("Category"),
+                        0, // Assuming memberCount is not fetched here; update this if needed
+                        rs.getObject("TeamLeaderID") != null ? rs.getInt("TeamLeaderID") : null // Handle nullable TeamLeaderID
+                ));
             }
             teamChoiceBox.setItems(teamList);
         } catch (SQLException e) {
@@ -157,7 +163,7 @@ public class AddMemberController {
             showAlert(Alert.AlertType.ERROR, "Validation Error", "Invalid email format.");
             return false;
         }
-        if (!phone.matches("\\d{10}")) {
+        if (!phone.matches("\\d{11}")) {
             showAlert(Alert.AlertType.ERROR, "Validation Error", "Phone number must be 10 digits.");
             return false;
         }

@@ -33,16 +33,31 @@
                   <RowConstraints />
                </rowConstraints>
                <children>
+                  <!-- Name Field -->
                   <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Name:" />
                   <TextField fx:id="nameField" prefHeight="26.0" prefWidth="341.0" promptText="Enter member's name" GridPane.columnIndex="1" />
+                  <Label fx:id="nameErrorLabel" style="-fx-text-fill: red;" text="Invalid Name" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                  <!-- Email Field -->
                   <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Email:" GridPane.rowIndex="1" />
                   <TextField fx:id="emailField" promptText="Enter email address" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label fx:id="emailErrorLabel" style="-fx-text-fill: red;" text="Invalid Email" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                  <!-- Phone Number Field -->
                   <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Phone Number:" GridPane.rowIndex="2" />
                   <TextField fx:id="phoneField" promptText="Enter phone number" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label fx:id="phoneErrorLabel" style="-fx-text-fill: red;" text="Invalid Phone Number" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                  <!-- Subscription Checkbox -->
                   <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Subscription Active:" GridPane.rowIndex="3" />
                   <CheckBox fx:id="subscriptionStatus" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                  <!-- Team ChoiceBox -->
                   <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Team:" GridPane.rowIndex="4" />
                   <ChoiceBox fx:id="teamChoiceBox" prefHeight="26.0" prefWidth="133.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Label fx:id="teamErrorLabel" style="-fx-text-fill: red;" text="Please select a team" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                  <!-- Buttons -->
                   <Button onAction="#handleSave" prefHeight="26.0" prefWidth="103.0" text="Save" GridPane.rowIndex="5" />
                   <Button onAction="#handleCancel" prefHeight="26.0" prefWidth="134.0" text="Cancel" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                </children>

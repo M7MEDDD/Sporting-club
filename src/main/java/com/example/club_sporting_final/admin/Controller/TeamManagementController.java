@@ -1,6 +1,5 @@
 package com.example.club_sporting_final.admin.Controller;
 
-import com.example.club_sporting_final.admin.module.Team;
 import com.example.club_sporting_final.utils.DatabaseConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,12 +9,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import com.example.club_sporting_final.admin.module.Team;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class TeamManagementController {
 
@@ -47,25 +44,23 @@ public class TeamManagementController {
 
     @FXML
     public void initialize() {
-        // Initialize TableView columns
         idColumn.setCellValueFactory(data -> data.getValue().teamIDProperty().asObject());
         nameColumn.setCellValueFactory(data -> data.getValue().teamNameProperty());
         coachColumn.setCellValueFactory(data -> data.getValue().coachNameProperty());
         categoryColumn.setCellValueFactory(data -> data.getValue().categoryProperty());
         memberCountColumn.setCellValueFactory(data -> data.getValue().memberCountProperty().asObject());
 
-        // Load teams into the TableView
         loadTeams();
     }
 
     private void loadTeams() {
         teamList.clear();
         String query = """
-                SELECT t.TeamID, t.TeamName, t.CoachName, t.Category, COUNT(m.MemberID) AS MemberCount
-                FROM Teams t
-                LEFT JOIN Members m ON t.TeamID = m.TeamID
-                GROUP BY t.TeamID, t.TeamName, t.CoachName, t.Category
-                """;
+            SELECT t.TeamID, t.TeamName, t.CoachName, t.Category, COUNT(m.MemberID) AS MemberCount
+            FROM Teams t
+            LEFT JOIN Members m ON t.TeamID = m.TeamID
+            GROUP BY t.TeamID, t.TeamName, t.CoachName, t.Category
+            """;
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = connection.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
@@ -76,7 +71,8 @@ public class TeamManagementController {
                         rs.getString("TeamName"),
                         rs.getString("CoachName"),
                         rs.getString("Category"),
-                        rs.getInt("MemberCount")
+                        rs.getInt("MemberCount"),
+                        null
                 ));
             }
 
@@ -87,99 +83,8 @@ public class TeamManagementController {
     }
 
     @FXML
-    private void searchTeam() {
-        String searchQuery = searchField.getText().trim();
-        if (searchQuery.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Search Error", "Please enter a team ID or name to search.");
-            return;
-        }
-
-        teamList.clear();
-        String query = """
-                SELECT t.TeamID, t.TeamName, t.CoachName, t.Category, COUNT(m.MemberID) AS MemberCount
-                FROM Teams t
-                LEFT JOIN Members m ON t.TeamID = m.TeamID
-                WHERE t.TeamID = ? OR t.TeamName LIKE ?
-                GROUP BY t.TeamID, t.TeamName, t.CoachName, t.Category
-                """;
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-
-            stmt.setString(1, searchQuery);
-            stmt.setString(2, "%" + searchQuery + "%");
-
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                teamList.add(new Team(
-                        rs.getInt("TeamID"),
-                        rs.getString("TeamName"),
-                        rs.getString("CoachName"),
-                        rs.getString("Category"),
-                        rs.getInt("MemberCount")
-                ));
-            }
-
-            if (teamList.isEmpty()) {
-                showAlert(Alert.AlertType.INFORMATION, "No Results", "No teams found matching the search criteria.");
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not search teams: " + e.getMessage());
-        }
-        teamTable.setItems(teamList);
-    }
-
-    @FXML
     private void addTeam() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/club_sporting_final/admin/AddTeamPage.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            stage.setTitle("Add Team");
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-
-            loadTeams(); // Reload teams after adding a new team
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not open Add Team page.");
-        }
-    }
-
-    @FXML
-    private void deleteTeam() {
-        Team selectedTeam = teamTable.getSelectionModel().getSelectedItem();
-        if (selectedTeam == null) {
-            showAlert(Alert.AlertType.WARNING, "No Selection", "Please select a team to delete.");
-            return;
-        }
-
-        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmationAlert.setTitle("Confirm Delete");
-        confirmationAlert.setHeaderText("Are you sure you want to delete this team?");
-        confirmationAlert.setContentText("Team ID: " + selectedTeam.getTeamID() + "\nTeam Name: " + selectedTeam.getTeamName());
-
-        if (confirmationAlert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-            try (Connection connection = DatabaseConnection.getInstance().getConnection();
-                 PreparedStatement stmt = connection.prepareStatement("DELETE FROM Teams WHERE TeamID = ?")) {
-
-                stmt.setInt(1, selectedTeam.getTeamID());
-                int rowsDeleted = stmt.executeUpdate();
-
-                if (rowsDeleted > 0) {
-                    teamTable.getItems().remove(selectedTeam);
-                    showAlert(Alert.AlertType.INFORMATION, "Success", "Team deleted successfully.");
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to delete the team.");
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                showAlert(Alert.AlertType.ERROR, "Database Error", "Could not delete team: " + e.getMessage());
-            }
-        }
+        openForm("/com/example/club_sporting_final/admin/AddTeamPage.fxml", "Add Team");
     }
 
     @FXML
@@ -204,21 +109,84 @@ public class TeamManagementController {
 
             loadTeams(); // Reload teams after editing
         } catch (IOException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not open Edit Team page.");
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not open Edit Team page: " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void deleteTeam() {
+        Team selectedTeam = teamTable.getSelectionModel().getSelectedItem();
+        if (selectedTeam == null) {
+            showAlert(Alert.AlertType.WARNING, "No Selection", "Please select a team to delete.");
+            return;
+        }
+
+        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmationAlert.setTitle("Confirm Delete");
+        confirmationAlert.setHeaderText("Are you sure you want to delete this team?");
+        confirmationAlert.setContentText("Team ID: " + selectedTeam.getTeamID() + "\nTeam Name: " + selectedTeam.getTeamName());
+
+        if (confirmationAlert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            try (Connection connection = DatabaseConnection.getInstance().getConnection();
+                 PreparedStatement stmt = connection.prepareStatement("DELETE FROM Teams WHERE TeamID = ?")) {
+
+                stmt.setInt(1, selectedTeam.getTeamID());
+                stmt.executeUpdate();
+
+                teamList.remove(selectedTeam);
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Team deleted successfully.");
+            } catch (SQLException e) {
+                showAlert(Alert.AlertType.ERROR, "Database Error", "Could not delete team: " + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void searchTeam() {
+        String searchText = searchField.getText().trim().toLowerCase();
+        if (searchText.isEmpty()) {
+            teamTable.setItems(teamList);
+            return;
+        }
+
+        ObservableList<Team> filteredList = FXCollections.observableArrayList();
+        for (Team team : teamList) {
+            if (team.getTeamName().toLowerCase().contains(searchText) ||
+                    team.getCoachName().toLowerCase().contains(searchText) ||
+                    team.getCategory().toLowerCase().contains(searchText)) {
+                filteredList.add(team);
+            }
+        }
+        teamTable.setItems(filteredList);
     }
 
     @FXML
     private void returnToDashboard() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/club_sporting_final/admin/Dashboard.fxml"));
-            Stage stage = (Stage) teamTable.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/club_sporting_final/admin/Dashboard.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) backButton.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Dashboard");
         } catch (IOException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not return to Dashboard.");
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not return to dashboard: " + e.getMessage());
+        }
+    }
+
+    private void openForm(String fxmlPath, String title) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle(title);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            loadTeams();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not open the requested form.");
         }
     }
 

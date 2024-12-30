@@ -19,9 +19,6 @@
                 <Label text="Team Name:" />
                 <TextField fx:id="teamNameField" promptText="Edit team name" GridPane.columnIndex="1" />
 
-                <Label text="Team Leader ID:" GridPane.rowIndex="1" />
-                <TextField fx:id="teamLeaderIDField" promptText="Edit team leader ID" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
                 <Label text="Coach Name:" GridPane.rowIndex="2" />
                 <TextField fx:id="coachNameField" promptText="Edit coach name" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 

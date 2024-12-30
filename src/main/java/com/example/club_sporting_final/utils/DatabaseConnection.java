@@ -9,6 +9,7 @@ public class DatabaseConnection {
     // Singleton instance
     private static DatabaseConnection instance;
 
+
     // Database credentials
 //<<<<<<< HEAD
     private static final String URL = "jdbc:mysql://localhost:3306/sportingclub"; // Update the URL if needed

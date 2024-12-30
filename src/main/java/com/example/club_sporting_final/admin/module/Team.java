@@ -1,21 +1,36 @@
 package com.example.club_sporting_final.admin.module;
 
-import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.*;
 
 public class Team {
     private final IntegerProperty teamID;
     private final StringProperty teamName;
-    private final StringProperty coachName;
-    private final StringProperty category;
-    private final IntegerProperty memberCount; // Added memberCount property
+    private  StringProperty coachName;
+    private  StringProperty category;
+    private  IntegerProperty memberCount;
+    private  IntegerProperty teamLeaderID;
 
-    public Team(int teamID, String teamName, String coachName, String category, int memberCount) {
+    public Team(int teamID, String teamName, String coachName, String category, int memberCount, Integer teamLeaderID) {
         this.teamID = new SimpleIntegerProperty(teamID);
         this.teamName = new SimpleStringProperty(teamName);
         this.coachName = new SimpleStringProperty(coachName);
         this.category = new SimpleStringProperty(category);
-        this.memberCount = new SimpleIntegerProperty(memberCount); // Initialize memberCount
+        this.memberCount = new SimpleIntegerProperty(memberCount);
+        this.teamLeaderID = new SimpleIntegerProperty(teamLeaderID != null ? teamLeaderID : 0);
+    }
+
+    public Team(int teamID, String teamName, StringProperty coachName, StringProperty category, IntegerProperty memberCount, IntegerProperty teamLeaderID) {
+        this.teamID = new SimpleIntegerProperty(teamID);
+        this.teamName = new SimpleStringProperty(teamName);
+        this.coachName = coachName;
+        this.category = category;
+        this.memberCount = memberCount;
+        this.teamLeaderID = teamLeaderID;
+    }
+
+    public Team(int teamID, String teamName) {
+        this.teamID = new SimpleIntegerProperty(teamID);
+        this.teamName = new SimpleStringProperty(teamName);
     }
 
     // Getters
@@ -59,6 +74,14 @@ public class Team {
         return memberCount;
     }
 
+    public Integer getTeamLeaderID() {
+        return teamLeaderID.get() == 0 ? null : teamLeaderID.get();
+    }
+
+    public IntegerProperty teamLeaderIDProperty() {
+        return teamLeaderID;
+    }
+
     // Setters
     public void setTeamID(int teamID) {
         this.teamID.set(teamID);
@@ -78,6 +101,10 @@ public class Team {
 
     public void setMemberCount(int memberCount) {
         this.memberCount.set(memberCount);
+    }
+
+    public void setTeamLeaderID(Integer teamLeaderID) {
+        this.teamLeaderID.set(teamLeaderID != null ? teamLeaderID : 0);
     }
 
     // Override toString to display teamName in ChoiceBox

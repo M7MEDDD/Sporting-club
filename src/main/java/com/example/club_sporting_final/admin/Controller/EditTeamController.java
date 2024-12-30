@@ -17,9 +17,6 @@ public class EditTeamController {
     private TextField teamNameField;
 
     @FXML
-    private TextField teamLeaderIDField;
-
-    @FXML
     private TextField coachNameField;
 
     @FXML
@@ -31,7 +28,7 @@ public class EditTeamController {
     @FXML
     private Button cancelButton;
 
-    private Team team;
+    private Team team; // The selected team object from the table
 
     @FXML
     public void initialize() {
@@ -49,10 +46,11 @@ public class EditTeamController {
         this.team = team;
 
         // Populate fields with the selected team's data
-        teamNameField.setText(team.getTeamName());
-        teamLeaderIDField.setText(String.valueOf(team.getTeamID())); // Assuming TeamLeaderID is an integer
-        coachNameField.setText(team.getCoachName());
-        categoryComboBox.setValue(team.getCategory());
+        if (team != null) {
+            teamNameField.setText(team.getTeamName());
+            coachNameField.setText(team.getCoachName());
+            categoryComboBox.setValue(team.getCategory());
+        }
     }
 
     /**
@@ -62,6 +60,11 @@ public class EditTeamController {
      */
     @FXML
     void handleSave(ActionEvent event) {
+        if (team == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "No team selected to edit.");
+            return;
+        }
+
         String teamName = teamNameField.getText().trim();
         String coachName = coachNameField.getText().trim();
         String category = categoryComboBox.getValue();
@@ -72,43 +75,15 @@ public class EditTeamController {
             return;
         }
 
-        Integer teamLeaderID = null;
-        if (!teamLeaderIDField.getText().trim().isEmpty()) {
-            try {
-                teamLeaderID = Integer.parseInt(teamLeaderIDField.getText().trim());
-            } catch (NumberFormatException e) {
-                showAlert(Alert.AlertType.ERROR, "Validation Error", "Team Leader ID must be a valid integer.");
-                return;
-            }
-        }
-
         // Database operations
         try (Connection connection = DatabaseConnection.getInstance().getConnection()) {
-            // Check if TeamLeaderID exists in members table
-            if (teamLeaderID != null) {
-                String checkQuery = "SELECT COUNT(*) FROM members WHERE MemberID = ?";
-                try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
-                    checkStmt.setInt(1, teamLeaderID);
-                    ResultSet rs = checkStmt.executeQuery();
-                    if (rs.next() && rs.getInt(1) == 0) {
-                        showAlert(Alert.AlertType.ERROR, "Validation Error", "The specified Team Leader ID does not exist.");
-                        return;
-                    }
-                }
-            }
-
             // Update team details
-            String updateQuery = "UPDATE teams SET TeamName = ?, TeamLeaderID = ?, CoachName = ?, Category = ? WHERE TeamID = ?";
+            String updateQuery = "UPDATE teams SET TeamName = ?, CoachName = ?, Category = ? WHERE TeamID = ?";
             try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
                 stmt.setString(1, teamName);
-                if (teamLeaderID != null) {
-                    stmt.setInt(2, teamLeaderID);
-                } else {
-                    stmt.setNull(2, java.sql.Types.INTEGER);
-                }
-                stmt.setString(3, coachName);
-                stmt.setString(4, category);
-                stmt.setInt(5, team.getTeamID());
+                stmt.setString(2, coachName);
+                stmt.setString(3, category);
+                stmt.setInt(4, team.getTeamID()); // Use the TeamID from the selected team object
 
                 int rowsUpdated = stmt.executeUpdate();
                 if (rowsUpdated > 0) {
@@ -118,8 +93,6 @@ public class EditTeamController {
                     showAlert(Alert.AlertType.ERROR, "Error", "Failed to update team.");
                 }
             }
-        } catch (SQLIntegrityConstraintViolationException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Foreign key constraint violation: Make sure the Team Leader ID exists.");
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Database Error", "An error occurred while updating the team: " + e.getMessage());

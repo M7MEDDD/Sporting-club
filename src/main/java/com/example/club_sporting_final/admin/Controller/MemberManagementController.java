@@ -86,6 +86,7 @@ public class MemberManagementController {
                         subscriptionStatus
                 ));
             }
+
             System.out.println("Members loaded successfully. Total: " + memberList.size());
         } catch (SQLException e) {
             showError("Database Error", "Could not load members: " + e.getMessage());
@@ -122,8 +123,10 @@ public class MemberManagementController {
                         rs.getString("Name"),
                         rs.getString("Email"),
                         rs.getString("PhoneNumber"),
-                        subscriptionStatus
+                        subscriptionStatus,
+                        rs.getObject("TeamID") != null ? rs.getInt("TeamID") : 0 // Default to 0 if TeamID is null
                 ));
+
             }
 
             if (memberList.isEmpty()) {
